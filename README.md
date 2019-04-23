@@ -6,4 +6,3 @@ ___
 
 * https://github.com/wri/UrbanLandUse
 * https://github.com/wri/dl_jobs
-* 
