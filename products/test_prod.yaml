@@ -1,0 +1,11 @@
+product:
+    name: tasks_test
+    description: description of test product
+    resolution: '10m'
+bands:
+    - ndvi
+    - ndwi
+inputs:
+    - 'airbus:oneatlas:phr:v2:PHR1A_201604030525439_1850267101-001_R2C1'
+    - 'airbus:oneatlas:phr:v2:PHR1B_201603210525340_1866537101-001_R1C1'
+    - 'airbus:oneatlas:phr:v2:PHR1B_201703130529519_2221140101-001_R2C1'
