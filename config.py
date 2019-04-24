@@ -4,10 +4,10 @@ import os
 #
 HOME=os.path.expanduser('~')
 PROJECT_DIR=os.path.dirname(os.path.realpath(__file__))
-PRODUCTS_DIR=f'{PROJECT_DIR}/products'
-DATA_DIR=f'{PROJECT_DIR}/data'
-STUDY_AREAS_DIR=f'{DATA_DIR}/study_areas'
-MODELS_DIR=f'{DATA_DIR}/models'
+PRODUCTS_DIR='{}/products'.format(PROJECT_DIR)
+DATA_DIR='{}/data'.format(PROJECT_DIR)
+STUDY_AREAS_DIR='{}/study_areas'.format(DATA_DIR)
+MODELS_DIR='{}/models'.format(DATA_DIR)
 
 
 

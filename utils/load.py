@@ -14,7 +14,7 @@ def meta(product,*keys):
         - product: str 
         - *keys: order sequence of dictionary keys
     """
-    meta=yaml.safe_load(open(f'{PRODUCTS_DIR}/{product}.yaml'))
+    meta=yaml.safe_load(open('{}/{}.yaml'.format(PRODUCTS_DIR,product)))
     for key in keys:
         meta=meta[key]
     return meta
@@ -23,18 +23,21 @@ def meta(product,*keys):
 
 def shape(study_area=None,path=None,ext='shp'):
     if not path:
-        selector=f'{STUDY_AREAS_DIR}/{study_area.lower()}/*.{ext}'
+        selector='{}/{}/*.{}'.format(
+            STUDY_AREAS_DIR,
+            study_area.lower(),
+            ext)
         path=glob(selector)[0]
     return geojson.loads(gpd.read_file(path).geometry.to_json())
 
 
 def models_list(ext='hd5'):
-    return glob(f'{MODELS_DIR}/*.{ext}')
+    return glob('{}/*.{}'.format(MODELS_DIR,ext))
 
 
 def model(path=None,filename=None,nb_cats=3):
     if not path:
-        path=f'{MODELS_DIR}/{filename}'
+        path='{}/{}'.format(MODELS_DIR,filename)
     return load_model(
         path, 
         custom_objects={'loss':make_loss_function_wcc([1]*nb_cats)})

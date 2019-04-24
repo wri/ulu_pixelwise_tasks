@@ -96,9 +96,9 @@ def water_mask(*args):
 
 def image_id(products,product_name,scene,tile_key=None):
     s_id=scene.properties.id
-    name=next(re.sub(f'^{p}',product_name,s_id) for p in products if p in s_id)
+    name=next(re.sub('^{p}'.format(p),product_name,s_id) for p in products if p in s_id)
     if tile_key:
-        name=f'{name}:{tile_key}'
+        name='{}:{}'.format(name,tile_key)
     return name
 
 
