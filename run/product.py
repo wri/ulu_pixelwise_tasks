@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function   
 import json
 from pprint import pprint
 from dl_jobs import catalog
@@ -27,7 +27,7 @@ IS_DEV=True
 def delete(product):
     product=h.first(product)
     meta=load.meta(product,'product')
-    prod_id=f'{c.USER}:{meta["name"]}'
+    prod_id='{}:{}'.format(c.USER,meta["name"])
     out=catalog.delete_product(prod_id)
     return json.dumps({ "method": "delete", "response": out })
 
