@@ -1,5 +1,7 @@
+import warnings
 import yaml
 import geojson
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from glob import glob
 import geopandas as gpd
 import tensorflow as tf
