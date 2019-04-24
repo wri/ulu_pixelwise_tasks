@@ -2,10 +2,27 @@ product:
     name: tasks_test
     description: description of test product
     resolution: '10m'
-bands:
-    - ndvi
-    - ndwi
+    bands:
+        - ndvi
+        - ndwi
+    resolution: 5
+    size: 1008
+    pad: 8
 inputs:
-    - 'airbus:oneatlas:phr:v2:PHR1A_201604030525439_1850267101-001_R2C1'
-    - 'airbus:oneatlas:phr:v2:PHR1B_201603210525340_1866537101-001_R1C1'
-    - 'airbus:oneatlas:phr:v2:PHR1B_201703130529519_2221140101-001_R2C1'
+    bands:
+        - blue
+        - green
+        - red
+        - nir
+        - swir1
+        - swir2
+        - alpha
+run:
+    products:
+        - 'sentinel-2:L1C'
+    study_areas:
+        - sitapur
+    dates:
+        - start: '2017-01-01'
+          end: '2017-03-01'
+
