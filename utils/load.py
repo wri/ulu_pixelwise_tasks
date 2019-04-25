@@ -1,13 +1,12 @@
 import warnings
 import yaml
 import geojson
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 from glob import glob
 import geopandas as gpd
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-import tensorflow.keras.backend as K
+from keras.models import load_model
+import keras.backend as K
 from config import STUDY_AREAS_DIR,PRODUCTS_DIR,MODELS_DIR
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 
@@ -20,7 +19,6 @@ def meta(product,*keys):
     for key in keys:
         meta=meta[key]
     return meta
-
 
 
 def shape(study_area=None,path=None,ext='shp'):
@@ -42,32 +40,7 @@ def model(path=None,filename=None,nb_cats=3):
         path='{}/{}'.format(MODELS_DIR,filename)
     return load_model(
         path, 
-        custom_objects={'loss':make_loss_function_wcc([1]*nb_cats)})
-
-
-def make_loss_function_wcc(weights):
-    """ make loss function: weighted categorical crossentropy
-        Args:
-            * weights<ktensor|nparray|list>: crossentropy weights
-        Returns:
-            * weighted categorical crossentropy function
-    """
-    if isinstance(weights,list) or isinstance(weights,np.ndarray):
-        weights=K.variable(weights)
-
-    def loss(target,output,from_logits=False):
-        if not from_logits:
-            output /= tf.reduce_sum(output,
-                                    len(output.get_shape()) - 1,
-                                    True)
-            _epsilon = tf.convert_to_tensor(K.epsilon(), dtype=output.dtype.base_dtype)
-            output = tf.clip_by_value(output, _epsilon, 1. - _epsilon)
-            weighted_losses = target * tf.log(output) * weights
-            return - tf.reduce_sum(weighted_losses,len(output.get_shape()) - 1)
-        else:
-            raise ValueError('WeightedCategoricalCrossentropy: not valid with logits')
-
-    return loss
+        custom_objects={'loss':'categorical_crossentropy'})
 
 
 

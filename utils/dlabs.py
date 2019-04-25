@@ -1,10 +1,13 @@
 from __future__ import print_function
+import warnings
 import json
 from pprint import pprint
 import descarteslabs as dl
 import config as c
 import utils.helpers as h
 import utils.load as load
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 #
 # CONFIG
 #
