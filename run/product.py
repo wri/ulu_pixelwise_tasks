@@ -5,6 +5,7 @@ from dl_jobs import catalog
 import config as c
 import utils.helpers as h
 import utils.load as load
+import utils.dlabs as dlabs
 #
 # DL FUNCTION ARGS
 #
@@ -49,4 +50,15 @@ def add_bands():
 
 def add_band():
     pass
+
+
+def tiles(product):
+    product=h.first(product)
+    regions=load.meta(product,'run','regions')
+    out=[]
+    for region in regions:
+        _,info=dlabs.get_tiles(region=region,product=product,return_info=True)
+        out.append(info)
+    return json.dumps(out)
+
 

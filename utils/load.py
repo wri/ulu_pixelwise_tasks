@@ -5,7 +5,7 @@ from glob import glob
 import geopandas as gpd
 from keras.models import load_model
 import keras.backend as K
-from config import STUDY_AREAS_DIR,PRODUCTS_DIR,MODELS_DIR
+from config import REGIONS_DIR,PRODUCTS_DIR,MODELS_DIR
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -21,21 +21,21 @@ def meta(product,*keys):
     return meta
 
 
-def shape(study_area=None,path=None,ext='shp'):
+def shape(region=None,path=None,ext='shp'):
     if not path:
         selector='{}/{}/*.{}'.format(
-            STUDY_AREAS_DIR,
-            study_area.lower(),
+            REGIONS_DIR,
+            region.lower(),
             ext)
         path=glob(selector)[0]
     return geojson.loads(gpd.read_file(path).geometry.to_json())
-
+        
 
 def models_list(ext='hd5'):
     return glob('{}/*.{}'.format(MODELS_DIR,ext))
 
 
-def model(path=None,filename=None,nb_cats=3):
+def model(filename=None,path=None,nb_cats=3):
     if not path:
         path='{}/{}'.format(MODELS_DIR,filename)
     return load_model(

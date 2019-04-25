@@ -1,4 +1,5 @@
 from __future__ import print_function
+import os
 import warnings
 import json
 from pprint import pprint
@@ -17,16 +18,37 @@ ALIGN_PIXELS=False
 #
 # PUBLIC
 #
-def get_tiles(product,study_area):
+def get_tiles(product=None,region=None,auto_save=True,return_info=False):
     product=h.first(product)
     meta=load.meta(product,'product')
-    shape=load.shape(study_area)
-    tiles=dl.scenes.DLTile.from_shape(
-            shape=shape, 
-            resolution=meta['resolution'], 
-            tilesize=meta['size'], 
-            pad=meta['pad'] )
-    return tiles
+    res,size,pad=meta['resolution'],meta['size'],meta['pad']
+    path=h.tiles_path(region,res,size,pad)
+    info={}
+    info['region']=region
+    info['path']=path
+    if os.path.isfile(path):
+        info['existing_file']=True
+        info['saved']=None
+        tiles=h.read_pickle(path)
+    else:
+        info['existing_file']=False
+        shape=load.shape(region)
+        tiles=dl.scenes.DLTile.from_shape(
+                shape=shape, 
+                resolution=res, 
+                tilesize=size, 
+                pad=pad )
+        if auto_save:
+            info['saved']=True
+            h.save_pickle(tiles,path)
+        else:
+            info['path']=None
+            info['saved']=False
+    info['nb_tiles']=len(tiles)
+    if return_info:
+        return tiles, info
+    else:
+        return tiles
 
 
 

@@ -1,4 +1,5 @@
 from __future__ import print_function
+import os
 import re
 import numpy as np
 import utils.helpers as h
@@ -9,7 +10,7 @@ from utils.generator import WINDOW_PADDING, ImageSampleGenerator, get_padding
 #
 DTYPE='float32'
 RESAMPLER='bilinear'
-
+EXTRACT_DATE_RGX=r':\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])_'
 
 #
 #   HELPERS
@@ -85,17 +86,36 @@ def product_image(
 def product_meta(
         products,
         product_name,
+        region_name,
         tile_key,
         scene,
         input_bands,
-        model_name,
-        model_file,
         window,
+        model_filename,        
+        model=None,
         include_cloud_mask=False,
         include_water_mask=True):
     name=image_id(products,product_name,scene,tile_key)
-    """ add all meta vars """
-    pass
+    date_match=re.search(EXTRACT_DATE_RGX,name)
+    if date_match:
+        date=name[date_match.start()+1:date_match.end()-1]
+    else:
+        date='9999-12-31'
+    if not model:
+        model=os.path.splitext(os.path.basename(model_filename))[0]
+    meta={
+        'date': date,
+        'region_name': region_name,
+        'tile_key': tile_key,
+        'scene': scene.properties.id, 
+        'window': window,
+        'model': model,
+        'model_filename': model_filename,
+        'input_bands': input_bands,
+        'water_mask': include_water_mask,
+        'cloud_mask': include_cloud_mask
+    }
+    return name, meta
 
 
 
