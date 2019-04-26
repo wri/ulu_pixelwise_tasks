@@ -6,7 +6,7 @@ product:
         - ndvi
         - ndwi
     resolution: 5
-    size: 48
+    size: 496
     pad: 8
 inputs:
     bands:

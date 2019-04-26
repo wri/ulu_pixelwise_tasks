@@ -1,5 +1,7 @@
 from __future__ import print_function
 import pickle
+import functools
+import operator
 import numpy as np
 from config import REGIONS_DIR
 #
@@ -71,4 +73,6 @@ def first(value):
         return value
 
 
+def flatten_list(a):
+    return functools.reduce(operator.iconcat, a, [])
 

@@ -2,6 +2,7 @@ from __future__ import print_function
 import os
 import re
 import numpy as np
+from dl_jobs.decorators import as_json, expand_kwargs
 import utils.helpers as h
 import utils.masks as masks
 from utils.generator import WINDOW_PADDING, ImageSampleGenerator, get_padding
@@ -82,7 +83,8 @@ def product_image(
     return np.dstack(band_images)
 
 
-
+@as_json
+@expand_kwargs
 def product_meta(
         products,
         product_name,
@@ -94,7 +96,8 @@ def product_meta(
         model_filename,        
         model=None,
         include_cloud_mask=False,
-        include_water_mask=True):
+        include_water_mask=True,
+        **kwargs):
     name=image_id(products,product_name,scene,tile_key)
     date_match=re.search(EXTRACT_DATE_RGX,name)
     if date_match:
@@ -115,7 +118,8 @@ def product_meta(
         'water_mask': include_water_mask,
         'cloud_mask': include_cloud_mask
     }
-    return name, meta
+    # return name, meta
+    return meta
 
 
 
