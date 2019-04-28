@@ -5,8 +5,9 @@ import copy
 from pprint import pprint
 import numpy as np
 import mproc
-from dl_jobs.job import DLJob
 import dl_jobs.catalog as catalog
+from dl_jobs.utils import Timer
+from dl_jobs.job import DLJob
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
@@ -28,16 +29,21 @@ CONFIG_METHODS=[
 #
 DATA=None
 MODULES=[
+    'config',
     'run',
+    'utils',
     'dl_jobs'
 ]
 REQUIREMENTS=[
-    'descarteslabs[complete]>=0.17.3',
-    'numpy==1.16.2',
+    'descarteslabs[complete]>=0.18',
+    'numpy==1.16.3',
     'rasterio==1.0.22',
-    'affine==2.2.2'
+    'requests==2.21.0',
+    'matplotlib==2.2.3',
+    'keras==2.1.2',
+    'tensorflow==1.1.0'
 ]
-GPUS=1
+GPUS=None
 
 
 #
@@ -61,7 +67,7 @@ def get_tile_args_list(tile,region_name,products,start,end,args=None):
     for scene in scenes:
         args['products']=products
         args['tile_key']=tile.key
-        args['scene']=scene
+        args['scene_id']=scene.properties.id
         args['region_name']=region_name
         args_list.append(args)
     return args_list
@@ -69,6 +75,9 @@ def get_tile_args_list(tile,region_name,products,start,end,args=None):
 
 
 def prediction_args_list(product,date_index=None,region_index=None):
+    timer=Timer()
+    print("\ncreating args_list:")
+    print("- {}".format(timer.start()))
     meta=load.meta(product)
     dates=extract_list(meta['run']['dates'],date_index)
     regions=extract_list(meta['run']['regions'],region_index)
@@ -96,6 +105,7 @@ def prediction_args_list(product,date_index=None,region_index=None):
                 tiles,
                 max_processes=MAX_THREADPOOL_PROCESSES)
             args_list.append(h.flatten_list(out))
+    print("- {} [{}]".format(timer.stop(),timer.duration()))
     return h.flatten_list(args_list)
 
 
@@ -111,16 +121,40 @@ def test(*args,**kwargs):
         task_index=0
     date_index=kwargs.get('date',None)
     region_index=kwargs.get('region',None)
-    print(TEST_WARN_TMP.format(task_index))
-    print(product,task_index,date_index,region_index)
+    kwargs.pop('args',False)
     kwargs.pop('args_list',False)
     args_list=prediction_args_list(
         product,
         date_index=date_index,
         region_index=region_index)
-    print('==',len(args_list))
     args=args_list[task_index]
-    pprint(args)
+    job=DLJob(
+        module_name='utils.ulu',
+        method_name='product_meta',
+        args=args,
+        modules=MODULES,
+        requirements=REQUIREMENTS,
+        data=DATA,
+        gpus=GPUS,
+        **kwargs )
+    return job
+
+
+
+def task(*args,**kwargs):
+    product=args[0]
+    if len(args)>1:
+        task_index=args[1]
+    else:
+        task_index=0
+    date_index=kwargs.get('date',None)
+    region_index=kwargs.get('region',None)
+    kwargs.pop('args',False)
+    kwargs.pop('args_list',False)
+    args_list=prediction_args_list(
+        product,
+        date_index=date_index,
+        region_index=region_index)
     job=DLJob(
         module_name='utils.ulu',
         method_name='product_meta',
@@ -131,17 +165,6 @@ def test(*args,**kwargs):
         gpus=GPUS,
         **kwargs )
     return job
-
-
-
-
-def tasks(product,date_index=None,region_index=None):
-    product=h.first(product)
-    args_list=prediction_args_list(
-        product,
-        date_index=date_index,
-        region_index=region_index)
-    # save_product_image.map(args_list)
 
 
 def predict(*args):
