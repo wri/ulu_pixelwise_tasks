@@ -2,7 +2,8 @@ from __future__ import print_function
 import os
 import re
 import numpy as np
-from dl_jobs.decorators import as_json, expand_kwargs
+import descarteslabs as dl
+from dl_jobs.decorators import as_json, expand_args
 import utils.helpers as h
 import utils.masks as masks
 from utils.generator import WINDOW_PADDING, ImageSampleGenerator, get_padding
@@ -16,11 +17,17 @@ EXTRACT_DATE_RGX=r':\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])_'
 #
 #   HELPERS
 #
-def image_id(products,product_name,scene,tile_key=None):
-    s_id=scene.properties.id
-    name=next(re.sub('^{}'.format(p),product_name,s_id) for p in products if p in s_id)
-    if tile_key:
-        name='{}:{}'.format(name,tile_key)
+def image_id(prods,pname,sid,tkey=None):
+    """
+    Args:
+        prods=products
+        pname=product_name
+        sid=scene_id
+        tkey=tile_key
+    """
+    name=next(re.sub('^{}'.format(p),pname,sid) for p in prods if p in sid)
+    if tkey:
+        name='{}:{}'.format(name,tkey)
     return name
 
 
@@ -55,21 +62,35 @@ def category_prediction(preds,mask):
 #
 #   PRODUCT
 #
+def create_product_image():
+    """ save im to dl cat """
+    pass
+
+
+def save_product_image(args_todo):
+    meta=product_meta("...")
+    im=product_image("...")
+    create_product_image(im,meta)
+
+
 def product_image(
-        scene,
-        ctx,
+        scene_id,
+        tile_key,
         input_bands,
-        model,
         window,
+        model,
         pad=WINDOW_PADDING,
         resampler=RESAMPLER,
         include_cloud_mask=False,
-        include_water_mask=True):
-    pad=get_padding(pad,window)
+        include_water_mask=True,
+        **kwargs):
+    scene=dl.scenes.Scene.from_id(scene_id)
+    tile=dl.scenes.DLTile.from_key(tile_key)
     im=scene.ndarray(
         bands=input_bands,
         ctx=ctx,
         resampler=resampler)
+    pad=get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     preds=predict(model,im.astype(DTYPE),window,pad)
     lulc=category_prediction(preds,blank_mask)
@@ -84,13 +105,13 @@ def product_image(
 
 
 @as_json
-@expand_kwargs
+@expand_args
 def product_meta(
         products,
         product_name,
         region_name,
+        scene_id,
         tile_key,
-        scene,
         input_bands,
         window,
         model_filename,        
@@ -98,7 +119,7 @@ def product_meta(
         include_cloud_mask=False,
         include_water_mask=True,
         **kwargs):
-    name=image_id(products,product_name,scene,tile_key)
+    name=image_id(products,product_name,scene_id,tile_key)
     date_match=re.search(EXTRACT_DATE_RGX,name)
     if date_match:
         date=name[date_match.start()+1:date_match.end()-1]
@@ -110,7 +131,7 @@ def product_meta(
         'date': date,
         'region_name': region_name,
         'tile_key': tile_key,
-        'scene': scene.properties.id, 
+        'scene': scene_id, 
         'window': window,
         'model': model,
         'model_filename': model_filename,
