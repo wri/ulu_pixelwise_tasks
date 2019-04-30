@@ -1,27 +1,7 @@
 from __future__ import print_function
-import math
-import json
-import copy
-from pprint import pprint
-import numpy as np
-import mproc
-import dl_jobs.catalog as catalog
 from dl_jobs.job import DLJob
 import ulu.info as info
-import utils.helpers as h
-import utils.load as load
-import utils.dlabs as dlabs
 
-MAX_THREADPOOL_PROCESSES=32
-
-#
-# CONSTANTS
-#
-TEST_WARN_TMP="TEST-MODE: executing sing task [{}]"
-CONFIG_METHODS=[
-    'test',
-    'tasks'
-]
 
 #
 # DL FUNCTION ARGS

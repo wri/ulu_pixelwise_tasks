@@ -2,7 +2,7 @@ from __future__ import print_function
 import os
 import numpy as np
 import descarteslabs as dl
-from dl_jobs.decorators import as_json, expand_args
+from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.load as load
 import utils.masks as masks
@@ -30,17 +30,21 @@ def prediction(
         pad=pad,
         look_window=window,
         prep_image=prep_image)
-    model=load.model(
-        key=model_key,
-        filename=model_filename)
-    preds=model.predict_generator(
-        generator, 
-        steps=generator.steps, 
-        verbose=0,
-        use_multiprocessing=False,
-        max_queue_size=1,
-        workers=1,)
     size=arr.shape[1]-2*h.get_padding(pad,window)
+    try:
+        model=load.model(
+            key=model_key,
+            filename=model_filename)
+        preds=model.predict_generator(
+            generator, 
+            steps=generator.steps, 
+            verbose=0,
+            use_multiprocessing=False,
+            max_queue_size=1,
+            workers=1 )
+    except:
+        """ TMP EXCEPTION: SHOULD LOAD FROM DLS """
+        preds=np.random.random(size*size*3)
     return preds.reshape((size,size,3),order='F')
 
 
@@ -123,6 +127,7 @@ PRODUCT_IMAGE_META=[
     'date',
 ]
 @as_json
+@attempt
 @expand_args
 def predict(**kwargs):
     """ PREDICTION METHOD """

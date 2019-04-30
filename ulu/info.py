@@ -23,8 +23,13 @@ def get_config(product,date_index=None,region_index=None):
     dates=h.extract_list(run_cfig['dates'],date_index)
     regions=h.extract_list(run_cfig['regions'],region_index)
     product_bands=product_cfig['bands']
+    product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
+    product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     return {
             'product': product_cfig['name'],
+            'product_id': product_id,
+            'title': product_title,
+            'description': product_cfig.get('description','name'),
             'model': h.model_name(**run_cfig['model']),
             'model_filename': run_cfig['model'].get('filename'),
             'model_key': run_cfig['model'].get('key'),

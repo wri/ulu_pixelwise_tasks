@@ -1,53 +1,40 @@
-from __future__ import print_function   
-import json
-from pprint import pprint
+from __future__ import print_function
 from dl_jobs.job import DLJob
-from dl_jobs import catalog
-import config as c
-import utils.helpers as h
-import utils.load as load
-import utils.dlabs as dlabs
-#
-# DL FUNCTION ARGS
-#
-DATA=None
-MODULES=[
-    'config',
-    'run',
-    'utils',
-    'dl_jobs'
-]
-REQUIREMENTS=[
-    'descarteslabs[complete]>=0.18',
-    'numpy==1.16.3',
-    'rasterio==1.0.22',
-    'requests==2.21.0',
-    'matplotlib==2.2.3',
-    'keras==2.1.2',
-    'tensorflow==1.1.0'
-]
-GPUS=None
-IS_DEV=True
+from utils.helpers import truthy
+import ulu.info as info
+
+CONFIRM_DELETE="ULU.product.delete: pass 'confirm=True' to delete product"
 #
 # TASKS
 #
-def delete(product):
-    product=h.first(product)
-    meta=load.meta(product,'product')
-    prod_id='{}:{}'.format(c.USER,meta["name"])
-    out=catalog.delete_product(prod_id)
-    return json.dumps({ "method": "delete", "response": out })
+def delete(*args,**kwargs):
+    job_kwargs=info.get_config(args[0])
+    confirm=kwargs.get('confirm')
+    if truthy(confirm):
+        job=DLJob(
+            module_name='ulu.product',
+            method_name='delete',
+            kwargs=job_kwargs,
+            platform_job=False,
+            noisy=kwargs.get('noisy',True),
+            log=False )
+    else:
+        print(CONFIRM_DELETE)
+        job=None
+    return job
 
 
 
-def create(product):
-    product=h.first(product)
-    meta=load.meta(product,'product')
-    out=catalog.add_product(
-        name=meta['name'],
-        description=meta['description'],
-        resolution=meta['resolution'] )
-    return json.dumps({ "method": "create", "response": out })
+def create(*args,**kwargs):
+    job_kwargs=info.get_config(args[0])
+    job=DLJob(
+        module_name='ulu.product',
+        method_name='create',
+        kwargs=job_kwargs,
+        platform_job=False,
+        noisy=kwargs.get('noisy',True),
+        log=False )
+    return job
 
 
 def add_bands():
@@ -57,18 +44,5 @@ def add_bands():
 def add_band():
     pass
 
-
-def tiles(*args,**kwargs):
-    job=DLJob(
-        module_name='utils.product',
-        method_name='tiles',
-        args=args[:1],
-        platform_job=False,
-        modules=MODULES,
-        requirements=REQUIREMENTS,
-        data=DATA,
-        gpus=GPUS,
-        **kwargs )
-    return job
 
 

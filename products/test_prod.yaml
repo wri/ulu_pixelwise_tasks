@@ -1,4 +1,5 @@
 product:
+    owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
     name: test_prod
     description: description of test product
     resolution: 5m

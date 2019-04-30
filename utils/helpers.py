@@ -18,6 +18,7 @@ EXTRACT_DATE_RGX=r'\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])'
 DEFAULT_DATE='9999-12-31'
 YYYY_MM_DD='%Y-%m-%d'
 AS_DATETIME=False
+FALSEY=['false','none','no','null','f','n','0']
 
 
 #
@@ -67,6 +68,30 @@ def model_name(name=None,filename=None,key=None):
         name=os.path.splitext(os.path.basename(base))[0]
     return name
 
+
+def product_id(name,owner):
+    if (":" in name) or (not owner):
+        return name
+    else:
+        return '{}:{}'.format(owner,name)
+
+
+def product_title(name,title):
+    if title:
+        return title
+    else:
+        return name.upper()
+
+
+def notes(notes_dict,exclude=[]):
+    note=""
+    exclude=map(str.upper,exclude)
+    for key in notes_dict.keys():
+        keyup=key.upper()
+        if keyup not in exclude:
+            note+="{}: {}\n".format(keyup,notes_dict[key])
+    return note
+    
 
 def image_id(prods,pname,sid,tkey=None):
     """
@@ -131,6 +156,16 @@ def read_pickle(path):
 #
 # PYTHON
 #
+def truthy(value):
+    if isinstance(value,bool) or isinstance(value,int) or (value is None):
+        return value
+    elif isinstance(value,str):
+        value=value.lower()
+        return value not in FALSEY
+    else:
+        raise ValueError('truthy: value must be str,int,bool')
+
+
 def first(value):
     if isinstance(value,tuple) or isinstance(value,list):
         return value[0]
@@ -159,6 +194,18 @@ def extract_date(dated_str,default=DEFAULT_DATE,as_datetime=AS_DATETIME):
         return datetime.strptime(date,YYYY_MM_DD)
     else:
         return date
+
+
+def start_end_datetimes(dates,as_datetime=False):
+    starts=[datetime.strptime(d['start'],YYYY_MM_DD) for d in dates]
+    ends=[datetime.strptime(d['end'],YYYY_MM_DD) for d in dates]
+    starts.sort()
+    ends.sort()
+    start=starts[0]
+    end=ends[-1]
+    if not as_datetime:
+        start,end=start.strftime(YYYY_MM_DD),end.strftime(YYYY_MM_DD)
+    return start, end
 
 
 def extract_kwargs(kwargs,arg_list):
