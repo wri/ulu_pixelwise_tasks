@@ -80,13 +80,13 @@ def product_image(
         window=window,
         pad=pad)
     lulc=category_prediction(preds,blank_mask)
-    cloud_mask,cloud_scores=masks.cloud_score(im,window=window,pad=pad)
-    cloud_scores=h.crop(cloud_scores,pad)
-    band_images=[ lulc, preds.max(axis=-1), cloud_scores ]
+    cmask,cscores=masks.cloud_score(im,window=window,pad=pad)
+    cscores=h.crop(cscores,pad)
+    band_images=[ lulc, preds.max(axis=-1), cscores ]
     if water_mask:
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
-        band_images.append(h.crop(cloud_mask,pad))
+        band_images.append(h.crop(cmask,pad))
     return np.dstack(band_images)
 
 
