@@ -4,6 +4,8 @@ from __future__ import print_function
 """
 import numpy as np
 from keras.utils.data_utils import Sequence
+import utils.helpers as h
+from config import WINDOW_PADDING
 # # IF EVER UPDATING KERAS/TF
 # from tensorflow.python.keras.utils.data_utils import Sequence
 
@@ -11,29 +13,11 @@ from keras.utils.data_utils import Sequence
 #
 # CONSTANTS
 #
-WINDOW_PADDING='window'
-
 
 
 #
 # Helpers
 #
-def window(x,j,i,r,bands_first=True):
-    """ UrbanLandUse: utils_rasters """
-    if bands_first:
-        w=x[:,j-r:j+r+1,i-r:i+r+1]
-    else:
-        w=x[j-r:j+r+1,i-r:i+r+1,:]
-    return w
-
-
-def get_padding(pad,window):
-    if pad==WINDOW_PADDING:
-        return int(window/2)
-    else:
-        return pad
-
-
 def preprocess(im):
     """
     - drop alpha
@@ -58,7 +42,7 @@ class ImageSampleGenerator(Sequence):
         if prep_image:
             image=preprocess(image)
         self.image=image
-        self.pad=get_padding(pad,look_window)
+        self.pad=h.get_padding(pad,look_window)
         self.look_window=look_window
         self._set_data(image)
     
@@ -79,13 +63,16 @@ class ImageSampleGenerator(Sequence):
         self.steps= self.batch_size
         self.reset()
 
+
     def __len__(self):
         'Denotes the number of batches per epoch'
         # this may need to be increased by one
         return self.steps
 
+
     def reset(self):
         self.batch_index=-1
+
 
     def __getitem__(self, index):
         'Generate one batch of data'
@@ -95,11 +82,12 @@ class ImageSampleGenerator(Sequence):
         inputs=self._get_inputs(index)
         return inputs
 
+
     def _get_inputs(self, index):
         look_radius=self.look_window/2
         samples=[]
         for j in range(self.pad,self.image.shape[1]-self.pad):
-            sample=window(
+            sample=h.window(
                 self.image,
                 j,index+self.pad,
                 look_radius,

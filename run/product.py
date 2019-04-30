@@ -1,6 +1,7 @@
 from __future__ import print_function   
 import json
 from pprint import pprint
+from dl_jobs.job import DLJob
 from dl_jobs import catalog
 import config as c
 import utils.helpers as h
@@ -11,14 +12,19 @@ import utils.dlabs as dlabs
 #
 DATA=None
 MODULES=[
+    'config',
     'run',
+    'utils',
     'dl_jobs'
 ]
 REQUIREMENTS=[
-    'descarteslabs[complete]>=0.17.3',
-    'numpy==1.16.2',
+    'descarteslabs[complete]>=0.18',
+    'numpy==1.16.3',
     'rasterio==1.0.22',
-    'affine==2.2.2'
+    'requests==2.21.0',
+    'matplotlib==2.2.3',
+    'keras==2.1.2',
+    'tensorflow==1.1.0'
 ]
 GPUS=None
 IS_DEV=True
@@ -52,13 +58,17 @@ def add_band():
     pass
 
 
-def tiles(product):
-    product=h.first(product)
-    regions=load.meta(product,'run','regions')
-    out=[]
-    for region in regions:
-        _,info=dlabs.get_tiles(region=region,product=product,return_info=True)
-        out.append(info)
-    return json.dumps(out)
+def tiles(*args,**kwargs):
+    job=DLJob(
+        module_name='utils.product',
+        method_name='tiles',
+        args=args[:1],
+        platform_job=False,
+        modules=MODULES,
+        requirements=REQUIREMENTS,
+        data=DATA,
+        gpus=GPUS,
+        **kwargs )
+    return job
 
 

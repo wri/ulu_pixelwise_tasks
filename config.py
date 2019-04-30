@@ -1,4 +1,6 @@
-import os 
+import os
+
+
 #
 # DIRECTORIES
 #
@@ -10,10 +12,15 @@ REGIONS_DIR='{}/regions'.format(DATA_DIR)
 MODELS_DIR='{}/models'.format(DATA_DIR)
 
 
-
-
-
 #
 # DL/PRODUCTS
 #
 USER='6d27def1bb7fb0138933a4ee2e33cce9f5af999a'
+
+
+
+#
+# OTHER
+#
+WINDOW_PADDING='window'
+RESAMPLER='bilinear'

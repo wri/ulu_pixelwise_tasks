@@ -1,6 +1,6 @@
 from __future__ import print_function
 import numpy as np
-from utils.generator import WINDOW_PADDING, get_padding, preprocess
+from utils.generator import WINDOW_PADDING, preprocess
 import utils.helpers as h 
 #
 # CLOUDS
@@ -34,7 +34,7 @@ def map_cloud_scores(
         scorer=default_cloud_score,
         pad=WINDOW_PADDING,
         noise=None):
-    pad=get_padding(pad,window)
+    pad=h.get_padding(pad,window)
     r=int(window/2)
     assert clouds.ndim==2
     assert clouds.shape[0]==clouds.shape[1]
