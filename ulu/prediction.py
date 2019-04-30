@@ -127,9 +127,7 @@ PRODUCT_IMAGE_META=[
 def predict(**kwargs):
     """ PREDICTION METHOD """
     meta=h.extract_kwargs(kwargs,PRODUCT_IMAGE_META)
-    print(meta)
     kwargs=h.extract_kwargs(kwargs,PRODUCT_IMAGE_ARGS)
-    print(kwargs)
     im=product_image(**kwargs)
     # upload_product_image(im,meta)
     kwargs['tmp_im_stats']={
