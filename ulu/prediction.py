@@ -83,9 +83,9 @@ def product_image(
     cloud_mask,cloud_scores=masks.cloud_score(im,window=window,pad=pad)
     cloud_scores=h.crop(cloud_scores,pad)
     band_images=[ lulc, preds.max(axis=-1), cloud_scores ]
-    if include_water_mask:
+    if water_mask:
         band_images.append(masks.water_mask(im,blank_mask))
-    if include_cloud_mask:
+    if cloud_mask:
         band_images.append(h.crop(cloud_mask,pad))
     return np.dstack(band_images)
 

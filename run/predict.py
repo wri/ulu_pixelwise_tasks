@@ -7,7 +7,7 @@ import numpy as np
 import mproc
 import dl_jobs.catalog as catalog
 from dl_jobs.job import DLJob
-import ulu.predict as ulu_pred
+import ulu.info as info
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
@@ -43,7 +43,7 @@ REQUIREMENTS=[
     'keras==2.1.2',
     'tensorflow==1.1.0'
 ]
-GPUS=None
+GPUS=1
 
 
 
@@ -55,12 +55,12 @@ def task(*args,**kwargs):
     limit=kwargs.get('limit',None)
     date_index=kwargs.get('date',None)
     region_index=kwargs.get('region',None)
-    args_list=ulu_pred.args_list(
+    args_list=info.config_list(
         product,
         date_index=date_index,
         region_index=region_index)
     if limit:
-        args_list=args_list[:limit]
+        args_list=args_list[:int(limit)]
     job=DLJob(
         module_name='ulu.prediction',
         method_name='predict',
@@ -69,7 +69,10 @@ def task(*args,**kwargs):
         requirements=REQUIREMENTS,
         data=DATA,
         gpus=GPUS,
-        **kwargs )
+        platform_job=True,
+        dl_image=kwargs.get('dl_image'),
+        noisy=kwargs.get('noisy'),
+        log=False )
     return job
 
 
