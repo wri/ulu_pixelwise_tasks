@@ -4,9 +4,10 @@ import numpy as np
 import descarteslabs as dl
 from dl_jobs.decorators import as_json, expand_args
 import utils.helpers as h
+import utils.load as load
 import utils.masks as masks
 from utils.generator import ImageSampleGenerator
-from config import WINDOW_PADDING,RESAMPLER
+from config import WINDOW,WINDOW_PADDING,RESAMPLER
 #
 #   CONSTANTS
 #
@@ -17,12 +18,21 @@ DTYPE='float32'
 #
 #  PREDICTION
 #
-def prediction(model,arr,window,pad,prep_image=True):
+def prediction(
+        arr,
+        model_key=None,
+        model_filename=None,
+        window=WINDOW,
+        pad=WINDOW_PADDING,
+        prep_image=True):
     generator=ImageSampleGenerator(
         arr,
         pad=pad,
         look_window=window,
         prep_image=prep_image)
+    model=load.model(
+        key=model_key,
+        filename=model_filename)
     preds=model.predict_generator(
         generator, 
         steps=generator.steps, 
@@ -50,7 +60,8 @@ def product_image(
         tile_key,
         input_bands,
         window,
-        model,
+        model_key,
+        model_filename,
         pad=WINDOW_PADDING,
         resampler=RESAMPLER,
         cloud_mask=False,
@@ -63,7 +74,11 @@ def product_image(
         resampler=resampler)
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
-    preds=prediction(model,im.astype(DTYPE),window,pad)
+    preds=prediction(
+        im.astype(DTYPE),
+        model_filename=model_filename,
+        window=window,
+        pad=pad)
     lulc=category_prediction(preds,blank_mask)
     cloud_mask,cloud_scores=masks.cloud_score(im,window=window,pad=pad)
     cloud_scores=h.crop(cloud_scores,pad)
@@ -85,7 +100,8 @@ PRODUCT_IMAGE_ARGS=[
     'tile_key',
     'input_bands',
     'window',
-    'model',
+    'model_key',
+    'model_filename',
     'pad',
     'resampler',
     'cloud_mask',

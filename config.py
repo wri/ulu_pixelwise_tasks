@@ -22,5 +22,6 @@ USER='6d27def1bb7fb0138933a4ee2e33cce9f5af999a'
 #
 # OTHER
 #
+WINDOW=17
 WINDOW_PADDING='window'
 RESAMPLER='bilinear'

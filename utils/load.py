@@ -35,7 +35,8 @@ def models_list(ext='hd5'):
     return glob('{}/*.{}'.format(MODELS_DIR,ext))
 
 
-def model(filename=None,path=None,nb_cats=3):
+def model(key=None,filename=None,path=None,nb_cats=3):
+    """ TODO: LOAD VIA KEY """
     if not path:
         path='{}/{}'.format(MODELS_DIR,filename)
     return load_model(

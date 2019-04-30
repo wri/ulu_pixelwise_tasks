@@ -73,11 +73,4 @@ def task(*args,**kwargs):
     return job
 
 
-def predict(*args):
-    print('\n'*5)
-    print('-'*100)
-    print(args)
-    # return {'keys':args[0].keys(),'len':len(args)}
-    return json.dumps({'keys':type(args),'len':len(args)})
-
 
