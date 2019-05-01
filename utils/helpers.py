@@ -89,7 +89,7 @@ def notes(notes_dict,exclude=[]):
     for key in notes_dict.keys():
         keyup=key.upper()
         if keyup not in exclude:
-            note+="{}: {}\n".format(keyup,notes_dict[key])
+            note+="{}: {}    \n".format(keyup,notes_dict[key])
     return note
     
 
@@ -208,8 +208,11 @@ def start_end_datetimes(dates,as_datetime=False):
     return start, end
 
 
-def extract_kwargs(kwargs,arg_list):
-    return { a:kwargs[a] for a in arg_list }
+def extract_kwargs(kwargs,arg_list,required=True,default=None):
+    if required:
+        return { a:kwargs[a] for a in arg_list }
+    else:
+        return { a:kwargs.get(a,default) for a in arg_list }
 
 
 def flatten_list(a):

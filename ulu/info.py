@@ -14,15 +14,37 @@ MAX_THREADPOOL_PROCESSES=32
 #
 # GET META/KWARGS
 #
+def get_bands_config(product):
+    meta=load.meta(product)
+    product_cfig=meta['product']
+    band_cfigs=meta['bands']
+    band_defaults=meta.get('band_defaults',{})
+    product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
+    cfig_list=[]
+    default_resolution=band_defaults.get(
+        'resolution',
+        h.strip_to_int(product_cfig['resolution'],'m') 
+    )
+    for i,band in enumerate(band_cfigs):
+        b=deepcopy(band_defaults)
+        b['product_id']=product_id
+        b['srcband']=i+1
+        b['resolution']=band.pop('resolution',default_resolution)
+        b.update(band)
+        cfig_list.append(b)
+    return cfig_list
+
+
 def get_config(product,date_index=None,region_index=None):
     meta=load.meta(product)
     res,size,pad=h.resolution_size_padding(meta=meta)
     run_cfig=meta['run']
     product_cfig=meta['product']
     input_cfig=meta['input']
+    band_cfigs=meta['bands']
+    product_bands=[ b['name'] for b in band_cfigs ]
     dates=h.extract_list(run_cfig['dates'],date_index)
     regions=h.extract_list(run_cfig['regions'],region_index)
-    product_bands=product_cfig['bands']
     product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
     product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     return {

@@ -3,11 +3,36 @@ product:
     name: test_prod
     description: description of test product
     resolution: 5m
-    bands:
-        - lulc
-        - scores
-        - cloud_score
-        - water_mask
+bands:
+    - name: lulc
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      type: class
+    - name: scores
+      description: output probablity from model
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: cloud_score
+      description: mean cloud value(0 or 1) in window of pixel
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: water_mask
+      description: 1=water, 0=no-water 
+      data_range: [0,1]
+      nodata: 1
+      type: mask
+band_defaults:
+    dtype: Byte
+    nbits: 8
+    resolution_unit: meters
 input:
     products:
         - 'sentinel-2:L1C'

@@ -12,11 +12,11 @@ import utils.dlabs as dlabs
 @attempt
 @expand_args
 def delete(**kwargs):
-    resp=dl.Catalog().remove_product(
+    out=dl.Catalog().remove_product(
         kwargs['product_id'], 
         add_namespace=True, 
         cascade=True )
-    return resp
+    return out
 
 
 
@@ -35,11 +35,55 @@ def create(**kwargs):
     prod_kwargs['start_datetime']=start
     prod_kwargs['end_datetime']=end
     prod_kwargs['notes']=h.notes(kwargs,exclude=PRODUCT_KWARGS)
-    resp=dl.Catalog().add_product( **prod_kwargs )
-    return resp
+    out=dl.Catalog().add_product( **prod_kwargs )
+    return out
 
 
 
 #
 # BANDS
 #
+@as_json
+@attempt
+@expand_args
+def add_bands(*args):
+    out=[]
+    for kwargs in args:
+        kwargs['return_as_dict']=True
+        out.append(add_band(kwargs))
+    return out 
+
+
+
+@as_json
+@attempt
+@expand_args
+def add_band(**kwargs):
+    out=dl.Catalog().add_band( **kwargs )
+    return out
+
+
+
+@as_json
+@attempt
+@expand_args
+def remove_bands(*args):
+    out=[]
+    for kwargs in args:
+        kwargs['return_as_dict']=True
+        out.append(remove_band(kwargs))
+    return out 
+
+
+
+@as_json
+@attempt
+@expand_args
+def remove_band(**kwargs):
+    product_id=kwargs['product_id']
+    name=kwargs['name']
+    out=dl.Catalog().remove_band( product_id, name )
+    if not out:
+        out={'SUCCESS': True}
+    return out
+
