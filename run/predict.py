@@ -12,6 +12,7 @@ MODULES=[
     'utils',
     'ulu',
     'run',
+    'mproc',
     'dl_jobs'
 ]
 REQUIREMENTS=[

@@ -48,8 +48,8 @@ def get_config(product,date_index=None,region_index=None):
     product_cfig=meta['product']
     model_cfig=meta['model']
     input_cfig=meta['input']
-    band_cfigs=meta['bands']
-    product_bands=[ b['name'] for b in band_cfigs ]
+    bands_cfig=get_bands_config(product)
+    product_bands=[ b['name'] for b in bands_cfig ]
     dates=h.extract_list(run_cfig['dates'],date_index)
     regions=h.extract_list(run_cfig['regions'],region_index)
     product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
@@ -67,6 +67,7 @@ def get_config(product,date_index=None,region_index=None):
             'cloud_mask': 'cloud_mask' in product_bands,
             'input_products': input_cfig['products'],
             'input_bands': input_cfig['bands'],
+            'bands': bands_cfig,
             'resampler': input_cfig['resampler'],
             'resolution': res,
             'size': size,

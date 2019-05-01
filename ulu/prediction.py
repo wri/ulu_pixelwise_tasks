@@ -9,7 +9,6 @@ import utils.helpers as h
 import utils.masks as masks
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
-import ulu.info as info
 import ulu.model
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -66,10 +65,10 @@ def category_prediction(preds,mask):
 # IMAGE
 #
 def product_image(
-        input_products,
         product,
         scene_id,
         tile_key,
+        bands,
         input_bands,
         window,
         model_key,
@@ -85,7 +84,7 @@ def product_image(
         ctx=tile,
         resampler=resampler,
         raster_info=True)
-    rinfo['bands']=info.get_bands_config(product)
+    rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     preds=prediction(
@@ -111,10 +110,10 @@ def product_image(
 # JOB METHODS
 #
 PRODUCT_IMAGE_ARGS=[
-    'input_products',
     'product',
     'scene_id',
     'tile_key',
+    'bands',
     'input_bands',
     'window',
     'model_key',
@@ -163,7 +162,7 @@ def predict(**kwargs):
             image_id=image_id,
             raster_meta=rinfo )
     out={
-        'ACTION': 'predict'
+        'ACTION': 'predict',
         'SUCCESS': True,
         'upload_id': upload_id,
         'image_id': image_id,
