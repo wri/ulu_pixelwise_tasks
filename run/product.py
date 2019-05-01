@@ -2,8 +2,10 @@ from __future__ import print_function
 from dl_jobs.job import DLJob
 from utils.helpers import truthy
 import ulu.info as info
+from config import CONFIRM_DELETE
 
-CONFIRM_DELETE="ULU.product.delete/remove: pass 'confirm=True' to delete product/band"
+
+
 #
 # CREATION TASKS
 #

@@ -1,4 +1,4 @@
-import descarteslabs as dl
+from descarteslabs.client.services.catalog import Catalog
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.load as load
@@ -12,7 +12,7 @@ import utils.dlabs as dlabs
 @attempt
 @expand_args
 def delete(**kwargs):
-    out=dl.Catalog().remove_product(
+    out=Catalog().remove_product(
         kwargs['product_id'], 
         add_namespace=True, 
         cascade=True )
@@ -35,7 +35,7 @@ def create(**kwargs):
     prod_kwargs['start_datetime']=start
     prod_kwargs['end_datetime']=end
     prod_kwargs['notes']=h.notes(kwargs,exclude=PRODUCT_KWARGS)
-    out=dl.Catalog().add_product( **prod_kwargs )
+    out=Catalog().add_product( **prod_kwargs )
     return out
 
 
@@ -59,7 +59,7 @@ def add_bands(*args):
 @attempt
 @expand_args
 def add_band(**kwargs):
-    out=dl.Catalog().add_band( **kwargs )
+    out=Catalog().add_band( **kwargs )
     return out
 
 
@@ -82,8 +82,12 @@ def remove_bands(*args):
 def remove_band(**kwargs):
     product_id=kwargs['product_id']
     name=kwargs['name']
-    out=dl.Catalog().remove_band( product_id, name )
+    out=Catalog().remove_band( product_id, name )
     if not out:
-        out={'SUCCESS': True}
+        out={ 
+            'ACTION': 'remove_band', 
+            'PRODUCT': product_id,
+            'BAND': name,
+            'SUCCESS': True }
     return out
 

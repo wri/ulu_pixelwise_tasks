@@ -3,9 +3,7 @@ import yaml
 import geojson
 from glob import glob
 import geopandas as gpd
-from keras.models import load_model
-import keras.backend as K
-from config import REGIONS_DIR,PRODUCTS_DIR,MODELS_DIR
+from config import REGIONS_DIR,PRODUCTS_DIR
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -31,17 +29,6 @@ def shape(region=None,path=None,ext='shp'):
     return geojson.loads(gpd.read_file(path).geometry.to_json())
         
 
-def models_list(ext='hd5'):
-    return glob('{}/*.{}'.format(MODELS_DIR,ext))
-
-
-def model(key=None,filename=None,path=None,nb_cats=3):
-    """ TODO: LOAD VIA KEY """
-    if not path:
-        path='{}/{}'.format(MODELS_DIR,filename)
-    return load_model(
-        path, 
-        custom_objects={'loss':'categorical_crossentropy'})
 
 
 

@@ -4,10 +4,10 @@ import numpy as np
 import descarteslabs as dl
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
-import utils.load as load
 import utils.masks as masks
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
+import ulu.model
 #
 #   CONSTANTS
 #
@@ -16,7 +16,7 @@ DTYPE='float32'
 
 
 #
-#  PREDICTION
+# PREDICTION
 #
 def prediction(
         arr,
@@ -32,7 +32,7 @@ def prediction(
         prep_image=prep_image)
     size=arr.shape[1]-2*h.get_padding(pad,window)
     try:
-        model=load.model(
+        model=ulu.model.load(
             key=model_key,
             filename=model_filename)
         preds=model.predict_generator(
@@ -57,7 +57,7 @@ def category_prediction(preds,mask):
 
 
 #
-#   PRODUCT
+# IMAGE
 #
 def product_image(
         scene_id,

@@ -8,6 +8,7 @@ import functools
 import operator
 import numpy as np
 from config import REGIONS_DIR, WINDOW_PADDING
+from config import DLS_ROOT, MODELS_DIR, STORAGE_DIR
 #
 # CONSTANTS
 #
@@ -67,6 +68,29 @@ def model_name(name=None,filename=None,key=None):
         base=filename or key
         name=os.path.splitext(os.path.basename(base))[0]
     return name
+
+
+def model_key(key,dls_root=None):
+    if dls_root is None: 
+        dls_root=DLS_ROOT
+    if dls_root and (dls_root not in key):
+        key='{}/{}'.format(dls_root,key)
+    return key
+
+
+def model_storage_path(key,storage_root=None):
+    if storage_root is None: 
+        storage_root=STORAGE_DIR
+    name=os.path.basename(key)
+    return "{}/{}".format(storage_root,name)
+
+
+def model_path(filename,local_root=None):
+    if local_root is None:
+        local_root=MODELS_DIR
+    if local_root:
+        filename='{}/{}'.format(local_root,filename)
+    return filename
 
 
 def product_id(name,owner):
