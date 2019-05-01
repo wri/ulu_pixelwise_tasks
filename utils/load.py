@@ -1,12 +1,11 @@
+from __future__ import print_function
 import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import yaml
 import geojson
 from glob import glob
 import geopandas as gpd
 from config import REGIONS_DIR,PRODUCTS_DIR
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
 
 def meta(product,*keys):
     """ get product meta data

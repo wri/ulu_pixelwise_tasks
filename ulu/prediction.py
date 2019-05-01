@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import numpy as np
 import descarteslabs as dl
 from descarteslabs.client.services.catalog import Catalog
@@ -10,9 +11,6 @@ import utils.masks as masks
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
 import ulu.model
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
 #
 #   CONSTANTS
 #
@@ -124,18 +122,13 @@ PRODUCT_IMAGE_ARGS=[
     'water_mask' 
 ]
 RASTER_META_ARGS=[
-    'product',
     'scene_id',
     'tile_key',
     'input_bands',
-    'model_key',
-    'window',
-    'resolution',
-    'size',
-    'pad',
+    'region_name',
     'cloud_mask',
     'water_mask',
-    'region_name',
+    'model_key',
     'date',
 ]
 IMAGE_ID_ARGS=[
@@ -147,20 +140,21 @@ IMAGE_ID_ARGS=[
 @as_json
 @attempt
 @expand_args
-def predict(**kwargs):
+def predict(*args,**kwargs):
     """ PREDICTION METHOD """
     product_id=kwargs.pop('product_id')
     meta=h.extract_kwargs(kwargs,RASTER_META_ARGS)
-    kwargs=h.extract_kwargs(kwargs,PRODUCT_IMAGE_ARGS)
     image_id_args=[kwargs[k] for k in IMAGE_ID_ARGS]
     image_id=h.image_id(*image_id_args)
-    im,rinfo=product_image(**kwargs)
-    rinfo['meta']=meta
+    prod_im_kwargs=h.extract_kwargs(kwargs,PRODUCT_IMAGE_ARGS)
+    im,rinfo=product_image(**prod_im_kwargs)
     upload_id=Catalog().upload_ndarray(
             ndarray=im,
             product_id=product_id,
             image_id=image_id,
-            raster_meta=rinfo )
+            raster_meta=rinfo,
+            extra_properties=meta,
+            acquired=meta['date'] )
     out={
         'ACTION': 'predict',
         'SUCCESS': True,

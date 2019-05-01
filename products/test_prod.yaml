@@ -4,12 +4,6 @@ product:
     description: description of test product
     resolution: 5m
 bands:
-    - name: lulc
-      description: landuse/landcover classes
-      data_range: [0,255]
-      nodata: 255
-      color: Palette
-      type: class
     - name: scores
       description: output probablity from model
       dtype: Float32
@@ -17,6 +11,16 @@ bands:
       data_range: [0.0,1.0]
       color: Undefined
       type: derived
+    - name: class
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      colormap:
+        - [0, 146, 70, 255]
+        - [240, 226, 168, 255]
+        - [65, 74, 76, 255]
+      type: class
     - name: cloud_score
       description: mean cloud value(0 or 1) in window of pixel
       dtype: Float32
@@ -50,15 +54,12 @@ model:
     filename: 3cat_Hin+Sin+Par+Vij+Jai+Hyd+Sit_green_2017.hd5
     key: 3cat_Hin+Sin+Par+Vij+Jai+Hyd+Sit_green_2017.hd5
 run:
-    size: 496
+    config_list_name: True
+    size: 240
     pad: window
     window: 17
     regions:
         - sitapur
     dates:
-        - start: '2017-01-01'
-          end: '2017-04-01'
-        - start: '2017-04-01'
-          end: '2017-07-01'
-        - start: '2017-10-01'
-          end: '2018-01-01'
+        - start: '2017-11-01'
+          end: '2017-11-15'

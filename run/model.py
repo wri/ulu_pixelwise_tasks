@@ -1,10 +1,10 @@
 from __future__ import print_function
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from dl_jobs.job import DLJob
 import utils.helpers as h
 import ulu.info as info
 from config import CONFIRM_DELETE
-
-
 
 #
 # CREATION TASKS

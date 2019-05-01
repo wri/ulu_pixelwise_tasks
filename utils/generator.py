@@ -1,4 +1,6 @@
 from __future__ import print_function
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 """ UrbanLandUse: image_sample_generator.py
 - minimal edits
 """

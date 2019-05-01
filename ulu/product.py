@@ -1,10 +1,11 @@
+from __future__ import print_function
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from descarteslabs.client.services.catalog import Catalog
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
-
-
 #
 # PRODUCT
 #

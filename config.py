@@ -12,6 +12,8 @@ REGIONS_DIR='{}/regions'.format(DATA_DIR)
 MODELS_DIR='{}/models'.format(DATA_DIR)
 STORAGE_DIR='/cache'
 DLS_ROOT='models/dev'
+CONFG_LIST_DIR='{}/config_lists'.format(DATA_DIR)
+
 
 #
 # DL/PRODUCTS

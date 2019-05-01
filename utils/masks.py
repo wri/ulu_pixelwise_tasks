@@ -1,7 +1,10 @@
 from __future__ import print_function
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import numpy as np
 from utils.generator import WINDOW_PADDING, preprocess
-import utils.helpers as h 
+import utils.helpers as h
+
 #
 # CLOUDS
 #

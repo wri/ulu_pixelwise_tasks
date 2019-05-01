@@ -1,4 +1,6 @@
 from __future__ import print_function
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from dl_jobs.job import DLJob
 import ulu.info as info
 
@@ -33,15 +35,22 @@ GPUS=1
 #
 def task(*args,**kwargs):
     product=args[0]
-    limit=kwargs.get('limit',None)
+    hard_limit=kwargs.get('hard_limit',0)
+    if hard_limit: 
+        hard_limit=int(hard_limit)
+        limit=hard_limit
+    else:
+        limit=kwargs.get('limit',0)
+        if limit: limit=int(limit)
     date_index=kwargs.get('date',None)
     region_index=kwargs.get('region',None)
     args_list=info.config_list(
         product,
         date_index=date_index,
-        region_index=region_index)
-    if limit:
-        args_list=args_list[:int(limit)]
+        region_index=region_index,
+        limit=limit )
+    if hard_limit:
+        args_list=args_list[:hard_limit]
     job=DLJob(
         module_name='ulu.prediction',
         method_name='predict',

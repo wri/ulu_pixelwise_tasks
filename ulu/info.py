@@ -1,11 +1,13 @@
+from __future__ import print_function
+import os
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from copy import deepcopy
 import mproc
 from dl_jobs.utils import Timer
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
-
-
 #
 # CONSTANTS
 #
@@ -73,7 +75,8 @@ def get_config(product,date_index=None,region_index=None):
             'size': size,
             'pad': pad,
             'regions': regions,
-            'dates': dates
+            'dates': dates,
+            'config_list_name': run_cfig.get('config_list_name')
         }
 
 
@@ -105,31 +108,50 @@ def scene_level_config_list(
 
 
 
-def config_list(product,date_index=None,region_index=None,limit=None):
-    timer=Timer()
+def config_list(
+        product,
+        date_index=None,
+        region_index=None,
+        limit=None,
+        config_list_name=None):
     cfig=get_config(product,date_index,region_index)
-    regions=cfig.pop('regions')
-    dates=cfig.pop('dates')
-    print("\ncreating kwarg_list:")
-    print("- {}".format(timer.start()))
-    cfig_list=[]
-    for region_name in regions:
-        tile_keys=dlabs.get_tile_keys(product,region_name)
-        if limit:
-            tile_keys=tile_keys[:limit]
-        for date in dates:
-            def _tile_config_list(tile_key):
-                return scene_level_config_list(
-                        tile_key,
-                        cfig['input_products'],
-                        date['start'],
-                        date['end'],
-                        region_name,
-                        cfig )
-            out=mproc.map_with_threadpool(
-                _tile_config_list,
-                tile_keys,
-                max_processes=MAX_THREADPOOL_PROCESSES)
-            cfig_list.append(h.flatten_list(out))
-    print("- {} [{}]".format(timer.stop(),timer.duration()))
-    return h.flatten_list(cfig_list)
+    if not config_list_name:
+        config_list_name=cfig['config_list_name']
+    path=h.config_list_path(
+        config_list_name,
+        product=product,
+        size=cfig['size'],
+        window=cfig['window'] )
+    if path and os.path.isfile(path):
+        cfig_list=h.read_pickle(path)
+    else:
+        timer=Timer()
+        regions=cfig.pop('regions')
+        dates=cfig.pop('dates')
+        print("\ncreating kwarg_list:")
+        print("- {}".format(timer.start()))
+        cfig_list=[]
+        for region_name in regions:
+            tile_keys=dlabs.get_tile_keys(product,region_name)
+            if limit:
+                tile_keys=tile_keys[:limit]
+            for date in dates:
+                def _tile_config_list(tile_key):
+                    return scene_level_config_list(
+                            tile_key,
+                            cfig['input_products'],
+                            date['start'],
+                            date['end'],
+                            region_name,
+                            cfig )
+                out=mproc.map_with_threadpool(
+                    _tile_config_list,
+                    tile_keys,
+                    max_processes=MAX_THREADPOOL_PROCESSES)
+                cfig_list.append(h.flatten_list(out))
+        print("- {} [{}]".format(timer.stop(),timer.duration()))
+        cfig_list=h.flatten_list(cfig_list)
+        if path: h.save_pickle(cfig_list,path)
+    return cfig_list
+
+

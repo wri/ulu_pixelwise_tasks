@@ -1,12 +1,13 @@
+from __future__ import print_function
 import os
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from glob import glob
 from keras.models import load_model
 from descarteslabs.client.services.storage import Storage
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 from config import MODELS_DIR, DLS_ROOT
-
-
 #
 # CONSTANTS
 #

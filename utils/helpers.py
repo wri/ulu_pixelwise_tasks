@@ -1,4 +1,6 @@
 from __future__ import print_function
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import os
 import re
 from datetime import datetime
@@ -8,7 +10,8 @@ import functools
 import operator
 import numpy as np
 from config import REGIONS_DIR, WINDOW_PADDING
-from config import DLS_ROOT, MODELS_DIR, STORAGE_DIR
+from config import DLS_ROOT, MODELS_DIR, STORAGE_DIR, CONFG_LIST_DIR
+
 #
 # CONSTANTS
 #
@@ -20,7 +23,7 @@ DEFAULT_DATE='9999-12-31'
 YYYY_MM_DD='%Y-%m-%d'
 AS_DATETIME=False
 FALSEY=['false','none','no','null','f','n','0']
-
+CONFIG_LIST_TMPL="{}_{}:{}"
 
 #
 # IMAGE HELPERS
@@ -93,6 +96,13 @@ def model_path(filename,local_root=None):
     return filename
 
 
+def config_list_path(config_list_name,product=None,size=None,window=None):
+    if config_list_name: 
+        if config_list_name is True:
+            config_list_name=CONFIG_LIST_TMPL.format(product,size,window)
+        return "{}/{}.p".format(CONFG_LIST_DIR,config_list_name)
+
+
 def product_id(name,owner):
     if (":" in name) or (not owner):
         return name
@@ -139,6 +149,7 @@ def resolution_size_padding(meta):
     run_cfig=meta['run']
     size=run_cfig['size']
     pad=get_padding(run_cfig['pad'],run_cfig['window'])
+    size=size+2*pad
     return res, size, pad
 
 
