@@ -15,8 +15,10 @@ MAX_THREADPOOL_PROCESSES=32
 # GET META/KWARGS
 #
 def get_model_config(product):
-    return load.meta(product,'model')
-
+    model_cfig=load.meta(product,'model')
+    model_cfig['key']=h.model_key(model_cfig['key'],model_cfig.get('dls_root'))    
+    return model_cfig
+    
 
 def get_bands_config(product):
     meta=load.meta(product)
@@ -44,6 +46,7 @@ def get_config(product,date_index=None,region_index=None):
     res,size,pad=h.resolution_size_padding(meta=meta)
     run_cfig=meta['run']
     product_cfig=meta['product']
+    model_cfig=meta['model']
     input_cfig=meta['input']
     band_cfigs=meta['bands']
     product_bands=[ b['name'] for b in band_cfigs ]
@@ -56,9 +59,9 @@ def get_config(product,date_index=None,region_index=None):
             'product_id': product_id,
             'title': product_title,
             'description': product_cfig.get('description','name'),
-            'model': h.model_name(**model['model']),
-            'model_filename': model['model'].get('filename'),
-            'model_key': model['model'].get('key'),
+            'model': h.model_name(**model_cfig),
+            'model_filename': model_cfig.get('filename'),
+            'model_key': model_cfig.get('key'),
             'window': run_cfig['window'],
             'water_mask': 'water_mask' in product_bands,
             'cloud_mask': 'cloud_mask' in product_bands,

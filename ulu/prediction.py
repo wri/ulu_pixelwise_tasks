@@ -1,13 +1,19 @@
 from __future__ import print_function
 import os
+import warnings
 import numpy as np
 import descarteslabs as dl
+from descarteslabs.client.services.catalog import Catalog
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.masks as masks
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
+import ulu.info as info
 import ulu.model
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
 #
 #   CONSTANTS
 #
@@ -60,6 +66,8 @@ def category_prediction(preds,mask):
 # IMAGE
 #
 def product_image(
+        input_products,
+        product,
         scene_id,
         tile_key,
         input_bands,
@@ -72,14 +80,17 @@ def product_image(
         water_mask=True ):
     scene,_=dl.scenes.Scene.from_id(scene_id)
     tile=dl.scenes.DLTile.from_key(tile_key)
-    im=scene.ndarray(
+    im,rinfo=scene.ndarray(
         bands=input_bands,
         ctx=tile,
-        resampler=resampler)
+        resampler=resampler,
+        raster_info=True)
+    rinfo['bands']=info.get_bands_config(product)
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     preds=prediction(
         im.astype(DTYPE),
+        model_key=model_key,
         model_filename=model_filename,
         window=window,
         pad=pad)
@@ -91,7 +102,7 @@ def product_image(
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
         band_images.append(h.crop(cmask,pad))
-    return np.dstack(band_images)
+    return np.dstack(band_images), rinfo
 
 
 
@@ -100,6 +111,8 @@ def product_image(
 # JOB METHODS
 #
 PRODUCT_IMAGE_ARGS=[
+    'input_products',
+    'product',
     'scene_id',
     'tile_key',
     'input_bands',
@@ -111,12 +124,12 @@ PRODUCT_IMAGE_ARGS=[
     'cloud_mask',
     'water_mask' 
 ]
-PRODUCT_IMAGE_META=[
+RASTER_META_ARGS=[
     'product',
     'scene_id',
     'tile_key',
     'input_bands',
-    'model',
+    'model_key',
     'window',
     'resolution',
     'size',
@@ -126,19 +139,38 @@ PRODUCT_IMAGE_META=[
     'region_name',
     'date',
 ]
+IMAGE_ID_ARGS=[
+    'input_products',
+    'product',
+    'scene_id',
+    'tile_key'
+]
 @as_json
 @attempt
 @expand_args
 def predict(**kwargs):
     """ PREDICTION METHOD """
-    meta=h.extract_kwargs(kwargs,PRODUCT_IMAGE_META)
+    product_id=kwargs.pop('product_id')
+    meta=h.extract_kwargs(kwargs,RASTER_META_ARGS)
     kwargs=h.extract_kwargs(kwargs,PRODUCT_IMAGE_ARGS)
-    im=product_image(**kwargs)
-    # upload_product_image(im,meta)
-    kwargs['tmp_im_stats']={
+    image_id_args=[kwargs[k] for k in IMAGE_ID_ARGS]
+    image_id=h.image_id(*image_id_args)
+    im,rinfo=product_image(**kwargs)
+    rinfo['meta']=meta
+    upload_id=Catalog().upload_ndarray(
+            ndarray=im,
+            product_id=product_id,
+            image_id=image_id,
+            raster_meta=rinfo )
+    out={
+        'ACTION': 'predict'
+        'SUCCESS': True,
+        'upload_id': upload_id,
+        'image_id': image_id,
+        'product_id': product_id,
         'shape': im.shape
     }
-    return kwargs
+    return out
 
 
 

@@ -35,20 +35,30 @@ def load(key=None,filename=None,storage_root=None,path=None):
         if key:
             path=h.model_storage_path(key,storage_root=storage_root)
             if not os.path.isfile(path):
-                dls_fetch(key,dest=path)
+                if not dls_fetch(key,dest=path):
+                    path=False      
         else:
             path=h.model_path(filename=filename)
-    return load_model(
-        path, 
-        custom_objects={'loss':'categorical_crossentropy'})
+    if path:
+        return load_model(
+            path, 
+            custom_objects={'loss':'categorical_crossentropy'})
+    else:
+        return False
 
 
 def dls_fetch(key,dest=None,dls_root=None,storage_root=None):
     key=h.model_key(key=key,dls_root=dls_root)
     if not dest:
         dest=h.model_storage_path(key,storage_root=storage_root)
-    out=Storage().get_file(key,dest)
-    return out
+    try:
+        Storage().get_file(key,dest)
+        return True
+    except Exception as e:
+        if NOTFOUND in str(e):
+            return False
+        else:
+            raise e    
 
 
 #
