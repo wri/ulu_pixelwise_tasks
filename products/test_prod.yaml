@@ -11,16 +11,6 @@ bands:
       data_range: [0.0,1.0]
       color: Undefined
       type: derived
-    - name: class
-      description: landuse/landcover classes
-      data_range: [0,255]
-      nodata: 255
-      color: Palette
-      colormap:
-        - [0, 146, 70, 255]
-        - [240, 226, 168, 255]
-        - [65, 74, 76, 255]
-      type: class
     - name: cloud_score
       description: mean cloud value(0 or 1) in window of pixel
       dtype: Float32
@@ -28,6 +18,16 @@ bands:
       data_range: [0.0,1.0]
       color: Undefined
       type: derived
+    - name: class
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      colormap:
+        - [0, 161, 137, 255]
+        - [178, 43, 43, 255]
+        - [118, 109, 112, 255]
+      type: class
     - name: water_mask
       description: 1=water, 0=no-water 
       data_range: [0,1]
@@ -62,4 +62,4 @@ run:
         - sitapur
     dates:
         - start: '2017-11-01'
-          end: '2017-11-15'
+          end: '2018-01-01'

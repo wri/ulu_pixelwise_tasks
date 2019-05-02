@@ -16,7 +16,7 @@ def delete(**kwargs):
     out=Catalog().remove_product(
         kwargs['product_id'], 
         add_namespace=True, 
-        cascade=True )
+        cascade=kwargs['cascade'] )
     return out
 
 

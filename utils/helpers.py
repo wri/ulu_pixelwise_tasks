@@ -149,7 +149,6 @@ def resolution_size_padding(meta):
     run_cfig=meta['run']
     size=run_cfig['size']
     pad=get_padding(run_cfig['pad'],run_cfig['window'])
-    size=size+2*pad
     return res, size, pad
 
 

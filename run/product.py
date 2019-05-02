@@ -16,8 +16,7 @@ def create(*args,**kwargs):
         method_name='create',
         kwargs=job_kwargs,
         platform_job=False,
-        noisy=kwargs.get('noisy',True),
-        log=False )
+        noisy=kwargs.get('noisy',True))
     return job
 
 
@@ -28,8 +27,7 @@ def add_bands(*args,**kwargs):
         method_name='add_bands',
         args=band_configs,
         platform_job=False,
-        noisy=kwargs.get('noisy',True),
-        log=False )
+        noisy=kwargs.get('noisy',True))
     return job
 
 
@@ -41,8 +39,7 @@ def add_band(*args,**kwargs):
         method_name='add_band',
         kwargs=band_configs[band_index],
         platform_job=False,
-        noisy=kwargs.get('noisy',True),
-        log=False )
+        noisy=kwargs.get('noisy',True))
     return job
 
 
@@ -51,6 +48,7 @@ def add_band(*args,**kwargs):
 #
 def delete(*args,**kwargs):
     job_kwargs=info.get_config(args[0])
+    job_kwargs['cascade']=kwargs.get('cascade',True)
     confirm=kwargs.get('confirm')
     if truthy(confirm):
         job=DLJob(
@@ -58,8 +56,7 @@ def delete(*args,**kwargs):
             method_name='delete',
             kwargs=job_kwargs,
             platform_job=False,
-            noisy=kwargs.get('noisy',True),
-            log=False )
+            noisy=kwargs.get('noisy',True),)
     else:
         print(CONFIRM_DELETE)
         job=None
@@ -75,8 +72,7 @@ def remove_bands(*args,**kwargs):
             method_name='remove_bands',
             args=band_configs,
             platform_job=False,
-            noisy=kwargs.get('noisy',True),
-            log=False )
+            noisy=kwargs.get('noisy',True),)
     else:
         print(CONFIRM_DELETE)
         job=None
@@ -93,8 +89,7 @@ def remove_band(*args,**kwargs):
             method_name='remove_band',
             kwargs=band_configs[band_index],
             platform_job=False,
-            noisy=kwargs.get('noisy',True),
-            log=False )
+            noisy=kwargs.get('noisy',True),)
     else:
         print(CONFIRM_DELETE)
         job=None

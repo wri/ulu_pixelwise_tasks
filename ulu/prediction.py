@@ -124,7 +124,6 @@ PRODUCT_IMAGE_ARGS=[
 RASTER_META_ARGS=[
     'scene_id',
     'tile_key',
-    'input_bands',
     'region_name',
     'cloud_mask',
     'water_mask',
@@ -144,6 +143,8 @@ def predict(*args,**kwargs):
     """ PREDICTION METHOD """
     product_id=kwargs.pop('product_id')
     meta=h.extract_kwargs(kwargs,RASTER_META_ARGS)
+    meta['cloud_mask']=str(meta['cloud_mask'])
+    meta['water_mask']=str(meta['water_mask'])
     image_id_args=[kwargs[k] for k in IMAGE_ID_ARGS]
     image_id=h.image_id(*image_id_args)
     prod_im_kwargs=h.extract_kwargs(kwargs,PRODUCT_IMAGE_ARGS)

@@ -19,16 +19,22 @@ def cloud_score(im,window,pad='window',noise=None):
     return mask, scores
 
 
-def cloud_mask(X,bands_first=False):
+def cloud_mask(im,bands_first=False,threshold=0.20):
     if bands_first:
-        L2=X[1,:,:]
+        L2=im[1,:,:]
     else:
-        L2=X[:,:,1]
-    index=(L2 >= 0.20)
-    grey=h.spectral_index(X,1,0,bands_first=bands_first)
-    index=np.logical_and(index, (abs(grey) < 0.2))    
-    grey=h.spectral_index(X,2,1,bands_first=bands_first)
-    return np.logical_and(index, (abs(grey) < 0.2))
+        L2=im[:,:,1]
+    index=(L2 >= threshold)
+    grey=h.spectral_index(im,1,0,bands_first=bands_first)
+    index=np.logical_and(index, (abs(grey) < threshold))    
+    grey=h.spectral_index(im,2,1,bands_first=bands_first)
+    return np.logical_and(index, (abs(grey) < threshold))
+
+
+def image_cloud_score(im,bands_first=False,threshold=0.20):
+    im=preprocess(im)
+    im=cloud_mask(im,bands_first=bands_first,threshold=threshold)
+    return im.mean()
 
 
 def map_cloud_scores(

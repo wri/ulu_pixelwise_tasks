@@ -11,7 +11,7 @@ ___
 
 ```bash
 # create product, bands and upload model
-$ dl_jobs run setup
+$ dl_jobs run setup test_prod
 
 # predict (save to dl catalog)
 $ dl_jobs run predict test_prod --dev f
