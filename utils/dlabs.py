@@ -84,7 +84,7 @@ def get_tile_keys(
 
 
 def get_scenes(products,aoi,start,end):
-    if isinstance(aoi,str) or isinstance(aoi,unicode):
+    if h.is_str(aoi):
         aoi=dl.scenes.DLTile.from_key(aoi)
     return dl.scenes.search(
         products=products,

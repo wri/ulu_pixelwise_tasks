@@ -11,6 +11,16 @@ bands:
       data_range: [0.0,1.0]
       color: Undefined
       type: derived
+    - name: class
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      colormap:
+        - [102, 141, 60, 255]
+        - [169, 161, 140, 255]
+        - [73, 56, 41, 255]
+      type: class
     - name: cloud_score
       description: mean cloud value(0 or 1) in window of pixel
       dtype: Float32
@@ -18,16 +28,6 @@ bands:
       data_range: [0.0,1.0]
       color: Undefined
       type: derived
-    - name: class
-      description: landuse/landcover classes
-      data_range: [0,255]
-      nodata: 255
-      color: Palette
-      colormap:
-        - [0, 161, 137, 255]
-        - [178, 43, 43, 255]
-        - [118, 109, 112, 255]
-      type: class
     - name: water_mask
       description: 1=water, 0=no-water 
       data_range: [0,1]
@@ -51,15 +51,22 @@ input:
     resampler: bilinear
 model: 
     # name: optional_model_short_name
-    filename: 3cat_Hin+Sin+Par+Vij+Jai+Hyd+Sit_green_2017.hd5
-    key: 3cat_Hin+Sin+Par+Vij+Jai+Hyd+Sit_green_2017.hd5
+    # filename: dev-test.h5
+    # key: dev-test.h5
+    # filename: 3cat_14ct_green_2017-slow.h5
+    # key: 3cat_14ct_green_2017-slow.h5
+    filename: 3cat_14ct_green_2017.hd5
+    key: 3cat_14ct_green_2017.hd5
+    # filename: 3cat_Hin+Sin+Par+Vij+Jai+Hyd+Sit_green_2017.hd5
+    # key: 3cat_Hin+Sin+Par+Vij+Jai+Hyd+Sit_green_2017.hd5
 run:
-    config_list_name: True
-    size: 240
+    config_list_name: 'run1'
+    # config_list_name: True
+    size: 512
     pad: window
     window: 17
     regions:
-        - sitapur
+        - sitapur_dev
     dates:
         - start: '2017-11-01'
-          end: '2018-01-01'
+          end: '2017-11-06'

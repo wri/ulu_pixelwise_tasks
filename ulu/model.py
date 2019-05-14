@@ -3,15 +3,18 @@ import os
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from glob import glob
-from keras.models import load_model
+from tensorflow.python.keras.models import load_model
 from descarteslabs.client.services.storage import Storage
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 from config import MODELS_DIR, DLS_ROOT
+
+
 #
 # CONSTANTS
 #
 NOTFOUND='404'
+MISSING_MODEL='ERROR[ulu.model:load] model not found for key/filename {}/{}'
 
 
 #
@@ -45,7 +48,7 @@ def load(key=None,filename=None,storage_root=None,path=None):
             path, 
             custom_objects={'loss':'categorical_crossentropy'})
     else:
-        return False
+        raise ValueError(MISSING_MODEL.format(key,filename))
 
 
 def dls_fetch(key,dest=None,dls_root=None,storage_root=None):

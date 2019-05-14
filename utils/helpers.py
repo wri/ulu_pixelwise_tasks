@@ -154,6 +154,7 @@ def resolution_size_padding(meta):
 
 def window(x,j,i,r,bands_first=True):
     """ UrbanLandUse: utils_rasters """
+    j,i,r=int(j),int(i),int(r)
     if bands_first:
         w=x[:,j-r:j+r+1,i-r:i+r+1]
     else:
@@ -182,7 +183,7 @@ def read_pickle(path):
     """ read pickle file
     """    
     with open(path,'rb') as file:
-        obj=pickle.load(file)
+        obj=pickle.load(file, encoding='latin1')
     return obj
 
 
@@ -190,6 +191,17 @@ def read_pickle(path):
 #
 # PYTHON
 #
+def is_str(value):
+    if isinstance(value,str):
+        return True
+    else:
+        try: 
+            is_a_str=isinstance(out,unicode)
+        except:
+            is_a_str=False
+        return is_a_str
+
+
 def truthy(value):
     if isinstance(value,bool) or isinstance(value,int) or (value is None):
         return value

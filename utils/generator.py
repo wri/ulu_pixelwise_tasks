@@ -5,11 +5,10 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 - minimal edits
 """
 import numpy as np
-from keras.utils.data_utils import Sequence
+from tensorflow.python.keras.utils import Sequence
 import utils.helpers as h
 from config import WINDOW_PADDING
-# # IF EVER UPDATING KERAS/TF
-# from tensorflow.python.keras.utils.data_utils import Sequence
+
 
 
 #
@@ -62,7 +61,7 @@ class ImageSampleGenerator(Sequence):
         self.batch_size=(image.shape[1]-self.pad-self.pad)
         self.size=self.batch_size^2
         # for starters, will make columns into batches/steps
-        self.steps= self.batch_size
+        self.steps=self.batch_size
         self.reset()
 
 

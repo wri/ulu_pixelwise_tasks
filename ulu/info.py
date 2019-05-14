@@ -116,7 +116,7 @@ def config_list(
         config_list_name=None):
     cfig=get_config(product,date_index,region_index)
     if not config_list_name:
-        config_list_name=cfig['config_list_name']
+        config_list_name=cfig.get('config_list_name',False)
     path=h.config_list_path(
         config_list_name,
         product=product,

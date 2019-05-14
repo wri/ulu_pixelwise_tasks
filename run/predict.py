@@ -17,17 +17,8 @@ MODULES=[
     'mproc',
     'dl_jobs'
 ]
-REQUIREMENTS=[
-    'descarteslabs[complete]>=0.18',
-    'numpy==1.16.3',
-    'rasterio==1.0.22',
-    'requests==2.21.0',
-    'matplotlib==2.2.3',
-    'keras==2.1.2',
-    'tensorflow==1.1.0'
-]
+REQUIREMENTS=[]
 GPUS=1
-
 
 
 #

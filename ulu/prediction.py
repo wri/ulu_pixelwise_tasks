@@ -11,10 +11,14 @@ import utils.masks as masks
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
 import ulu.model
+import tensorflow as tf
+
+from pprint import pprint
 #
 #   CONSTANTS
 #
 DTYPE='float32'
+
 
 
 
@@ -34,20 +38,16 @@ def prediction(
         look_window=window,
         prep_image=prep_image)
     size=arr.shape[1]-2*h.get_padding(pad,window)
-    try:
-        model=ulu.model.load(
-            key=model_key,
-            filename=model_filename)
-        preds=model.predict_generator(
-            generator, 
-            steps=generator.steps, 
-            verbose=0,
-            use_multiprocessing=False,
-            max_queue_size=1,
-            workers=1 )
-    except:
-        """ TMP EXCEPTION: SHOULD LOAD FROM DLS """
-        preds=np.random.random(size*size*3)
+    model=ulu.model.load(
+        key=model_key,
+        filename=model_filename)
+    preds=model.predict_generator(
+        generator, 
+        steps=generator.steps, 
+        verbose=0,
+        use_multiprocessing=False,
+        max_queue_size=1,
+        workers=1 )
     return preds.reshape((size,size,3),order='F')
 
 
@@ -94,7 +94,7 @@ def product_image(
     lulc=category_prediction(preds,blank_mask)
     cmask,cscores=masks.cloud_score(im,window=window,pad=pad)
     cscores=h.crop(cscores,pad)
-    band_images=[ lulc, preds.max(axis=-1), cscores ]
+    band_images=[ preds.max(axis=-1), lulc, cscores ]
     if water_mask:
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
