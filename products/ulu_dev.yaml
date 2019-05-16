@@ -1,0 +1,64 @@
+product:
+    owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
+    name: ulu_dev
+    description: landuse/landcover in urban india
+    resolution: 5m
+bands:
+    - name: scores
+      description: output probablity from model
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: class
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      colormap:
+        - [102, 141, 60, 255]
+        - [169, 161, 140, 255]
+        - [73, 56, 41, 255]
+      type: class
+    - name: cloud_score
+      description: mean cloud value(0 or 1) in window of pixel
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: water_mask
+      description: 1=water, 0=no-water 
+      data_range: [0,1]
+      nodata: 1
+      type: mask
+band_defaults:
+    dtype: Byte
+    nbits: 8
+    resolution_unit: meters
+input:
+    products:
+        - 'sentinel-2:L1C'
+    bands:
+        - blue
+        - green
+        - red
+        - nir
+        - swir1
+        - swir2
+        - alpha
+model: 
+    # name: optional_model_short_name
+    filename: 3cat_14ct_green_2017.hd5
+    key: 3cat_14ct_green_2017.hd5
+run:
+    config_list_name: True
+    size: 496
+    pad: window
+    window: 17
+    regions:
+        - kerala
+    dates:
+        - start: '2017-11-01'
+          end: '2018-01-01'
