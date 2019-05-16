@@ -37,6 +37,17 @@ def get_tiles_path(product,region,limit):
     return path
 
 
+def get_scenes_kwargs(product,region,limit):
+    meta=load.meta(product)
+    input_cfig=meta['input']
+    run_cfig=meta['run']
+    return {
+        'input_products':input_cfig['products'],
+        'nb_scenes': run_cfig['nb_scenes'],
+        'start_date': run_cfig['start_date'],
+        'end_date': run_cfig['end_date'],
+        'region': region,
+        'limit': limit }
 
 
 

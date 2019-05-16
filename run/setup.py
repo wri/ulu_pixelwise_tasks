@@ -62,7 +62,7 @@ def tiles(product,region=ALL,**kwargs):
         return _tiles_job(product,region,force,noisy,limit)
 
 
-def scenes(product,region,nb_scenes,**kwargs):
+def scenes(product,region=ALL,**kwargs):
     """ save scenes """
     force=h.truthy(kwargs.get('force',False))
     noisy=h.truthy(kwargs.get('noisy',True))
@@ -112,7 +112,7 @@ def _scenes_job(product,region,force,noisy,limit ):
         nb_scenes=cfig['nb_scenes']
         start_date=cfig['start_date']
         end_date=cfig['end_date']
-        path=info.scenes_path(
+        path=h.scenes_path(
             tiles_path,
             nb_scenes,
             start_date,
@@ -121,15 +121,8 @@ def _scenes_job(product,region,force,noisy,limit ):
             raise ValueError( SCENES_EXIST.format(path) )
         else:
             tile_keys=h.read_pickle(tiles_path)
-            kwargs={
-                'input_products':input_products,
-                'nb_scenes': nb_scenes,
-                'start_date': start_date,
-                'end_date': end_date,
-                'region': region,
-                'limit': limit,
-            }
-            arg_list=[ h.copy_update(kwargs,'tile_key',t) for t in tile_keys]
+            kwargs=info.get_scenes_kwargs(product,region,limit)
+            args_list=[ h.copy_update(kwargs,'tile_key',t) for t in tile_keys ]
         job=DLJob(
             module_name='ulu.setup',
             method_name='save_scenes',
