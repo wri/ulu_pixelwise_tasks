@@ -9,6 +9,7 @@ PROJECT_DIR=os.path.dirname(os.path.realpath(__file__))
 PRODUCTS_DIR='{}/products'.format(PROJECT_DIR)
 DATA_DIR='{}/data'.format(PROJECT_DIR)
 TILES_DIR='{}/tiles'.format(DATA_DIR)
+SCENES_DIR='{}/scenes'.format(DATA_DIR)
 REGIONS_DIR='{}/regions'.format(DATA_DIR)
 MODELS_DIR='{}/models'.format(DATA_DIR)
 STORAGE_DIR='/cache'

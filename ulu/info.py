@@ -8,7 +8,6 @@ from dl_jobs.utils import Timer
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
-from config import TILES_DIR
 #
 # CONSTANTS
 #
@@ -19,6 +18,38 @@ TILES_EXIST='ERROR[ulu.save_tiles]: tile_set ({}) exists. use force=True to over
 #
 # GET META/KWARGS
 #
+def get_tiles_path(product,region,limit):
+    meta=load.meta(product)
+    run_cfig=meta['run']
+    name=run_cfig.get('tile_set')   
+    if name:
+        path='{}/{}'.format(directory,name)
+    else:
+        res,size,pad=h.resolution_size_padding(meta=meta)
+        version=run_cfig.get('version')
+        path=h.tiles_path( 
+            region,
+            res,
+            size,
+            pad,
+            version,
+            limit )
+    return path
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def get_model_config(product):
     model_cfig=load.meta(product,'model')
     model_cfig['key']=h.model_key(model_cfig['key'],model_cfig.get('dls_root'))    

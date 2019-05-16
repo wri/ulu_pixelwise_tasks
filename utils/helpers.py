@@ -9,23 +9,22 @@ import pickle
 import functools
 import operator
 import numpy as np
-from config import REGIONS_DIR, WINDOW_PADDING, DLS_ROOT
-from config import TILES_DIR, MODELS_DIR, STORAGE_DIR, CONFG_LIST_DIR
+from config import REGIONS_DIR, WINDOW_PADDING, DLS_ROOT, CONFG_LIST_DIR
+from config import SCENES_DIR, TILES_DIR, MODELS_DIR, STORAGE_DIR
 
 
-from pprint import pprint
 #
 # CONSTANTS
 #
 EPS=1e-8
-# TILES_TMPL='{}/{}/tiles-{}:{}:{}.p'
-TILE_KEYS_TMPL='{}/{}-{}:{}:{}'
+TILES_SCENES_TMPL='{}/{}-{}:{}:{}'
 EXTRACT_DATE_RGX=r'\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])'
 DEFAULT_DATE='9999-12-31'
 YYYY_MM_DD='%Y-%m-%d'
 AS_DATETIME=False
 FALSEY=['false','none','no','null','f','n','0']
 CONFIG_LIST_TMPL="{}_{}:{}"
+SEP_RGX=r'[_\-\.\,/\ ]'
 
 #
 # IMAGE HELPERS
@@ -55,21 +54,36 @@ def spectral_index(im,b1,b2,eps=EPS,bands_first=False):
 # PATHS/NAMES/VALUES
 #
 
-# def tiles_path(region,res,size,pad):
-#     return TILES_TMPL.format(
-#             TILES_DIR,
-#             region.lower(),
-#             res,size,pad )
 
-
-def tile_keys_path(region,res,size,pad,version=None):
-    path=TILE_KEYS_TMPL.format(
+def tiles_path(
+        region,
+        res,
+        size,
+        pad,
+        version=None,
+        limit=None):
+    path=TILES_SCENES_TMPL.format(
             TILES_DIR,
             region.lower(),
             res,size,pad )
     if version:
         path='{}-v{}'.format(path,version)
+    if limit:
+        path='{}-lim{}'.format(path,limit)
     return '{}.p'.format(path)
+
+
+def scenes_path(tiles_path,nb_scenes,start_date,end_date):
+    name=re.sub(r'\.p$','',os.path.basename(tiles_path))
+    start_date=int(re.sub(SEP_RGX,'',start_date))
+    end_date=int(re.sub(SEP_RGX,'',end_date))
+    path=TILES_SCENES_TMPL.format(
+        SCENES_DIR,
+        name,
+        nb_scenes,
+        start_date,
+        end_date )
+    return '{}.ndjson'.format(path)
 
 
 def model_name(name=None,filename=None,key=None):
@@ -197,6 +211,16 @@ def read_pickle(path):
 #
 # PYTHON
 #
+def copy_update(data,update,value=None):
+    data=deepcopy(data)
+    if update:
+        if isinstance(update,dict):
+            data.update(update)
+        else: 
+            data[update]=value
+    return data
+
+
 def is_str(value):
     if isinstance(value,str):
         return True
