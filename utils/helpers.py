@@ -19,7 +19,7 @@ from pprint import pprint
 #
 EPS=1e-8
 # TILES_TMPL='{}/{}/tiles-{}:{}:{}.p'
-TILE_KEYS_TMPL='{}/{}/tile_keys-{}:{}:{}'
+TILE_KEYS_TMPL='{}/{}-{}:{}:{}'
 EXTRACT_DATE_RGX=r'\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])'
 DEFAULT_DATE='9999-12-31'
 YYYY_MM_DD='%Y-%m-%d'
