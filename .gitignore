@@ -16,6 +16,7 @@ man
 playground.py
 playground.sh
 playground/
+tmp*
 
 # Postprocessing
 postprocess/regions/*/

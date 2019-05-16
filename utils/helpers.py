@@ -9,15 +9,17 @@ import pickle
 import functools
 import operator
 import numpy as np
-from config import REGIONS_DIR, WINDOW_PADDING
-from config import DLS_ROOT, MODELS_DIR, STORAGE_DIR, CONFG_LIST_DIR
+from config import REGIONS_DIR, WINDOW_PADDING, DLS_ROOT
+from config import TILES_DIR, MODELS_DIR, STORAGE_DIR, CONFG_LIST_DIR
 
+
+from pprint import pprint
 #
 # CONSTANTS
 #
 EPS=1e-8
-TILES_TMPL='{}/{}/tiles-{}:{}:{}.p'
-TILE_KEYS_TMPL='{}/{}/tile_keys-{}:{}:{}.p'
+# TILES_TMPL='{}/{}/tiles-{}:{}:{}.p'
+TILE_KEYS_TMPL='{}/{}/tile_keys-{}:{}:{}'
 EXTRACT_DATE_RGX=r'\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])'
 DEFAULT_DATE='9999-12-31'
 YYYY_MM_DD='%Y-%m-%d'
@@ -52,18 +54,22 @@ def spectral_index(im,b1,b2,eps=EPS,bands_first=False):
 #
 # PATHS/NAMES/VALUES
 #
-def tiles_path(region,res,size,pad):
-    return TILES_TMPL.format(
-            REGIONS_DIR,
-            region.lower(),
-            res,size,pad )
+
+# def tiles_path(region,res,size,pad):
+#     return TILES_TMPL.format(
+#             TILES_DIR,
+#             region.lower(),
+#             res,size,pad )
 
 
-def tile_keys_path(region,res,size,pad):
-    return TILE_KEYS_TMPL.format(
-            REGIONS_DIR,
+def tile_keys_path(region,res,size,pad,version=None):
+    path=TILE_KEYS_TMPL.format(
+            TILES_DIR,
             region.lower(),
             res,size,pad )
+    if version:
+        path='{}-v{}'.format(path,version)
+    return '{}.p'.format(path)
 
 
 def model_name(name=None,filename=None,key=None):
@@ -254,7 +260,7 @@ def start_end_datetimes(dates,as_datetime=False):
     return start, end
 
 
-def extract_kwargs(kwargs,arg_list,required=True,default=None):
+def extract_kwargs(kwargs,arg_list,required=False,default=None):
     if required:
         return { a:kwargs[a] for a in arg_list }
     else:

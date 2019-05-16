@@ -26,12 +26,13 @@ GPUS=1
 #
 def task(*args,**kwargs):
     product=args[0]
+    nb_scenes=kwargs.get('nb_scenes',False)
     hard_limit=kwargs.get('hard_limit',0)
     if hard_limit: 
         hard_limit=int(hard_limit)
         limit=hard_limit
     else:
-        limit=kwargs.get('limit',0)
+        limit=kwargs.get('limit',False)
         if limit: limit=int(limit)
     date_index=kwargs.get('date',None)
     region_index=kwargs.get('region',None)
@@ -39,7 +40,8 @@ def task(*args,**kwargs):
         product,
         date_index=date_index,
         region_index=region_index,
-        limit=limit )
+        limit=limit,
+        nb_scenes=nb_scenes )
     if hard_limit:
         args_list=args_list[:hard_limit]
     job=DLJob(
@@ -55,6 +57,8 @@ def task(*args,**kwargs):
         noisy=kwargs.get('noisy'),
         log=False )
     return job
+
+
 
 
 

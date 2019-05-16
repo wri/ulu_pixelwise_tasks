@@ -14,6 +14,21 @@ def task(*args,**kwargs):
 
 
 
-def prep_args(*args,**kwargs):
+def tiles(*args,**kwargs):
     """ save arglist for fixed nb of tiles best cloudscores """
-    pass
+    product=args[0]
+    hard_limit=kwargs.get('hard_limit',0)
+    if hard_limit: 
+        hard_limit=int(hard_limit)
+        limit=hard_limit
+    else:
+        limit=kwargs.get('limit',False)
+        if limit: limit=int(limit)
+    date_index=kwargs.get('date',None)
+    region_index=kwargs.get('region',None)
+    args_list=info.config_list(
+        product,
+        date_index=date_index,
+        region_index=region_index,
+        limit=limit,
+        nb_scenes=nb_scenes )

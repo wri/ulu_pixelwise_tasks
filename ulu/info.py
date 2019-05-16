@@ -8,10 +8,13 @@ from dl_jobs.utils import Timer
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
+from config import TILES_DIR
 #
 # CONSTANTS
 #
 MAX_THREADPOOL_PROCESSES=32
+TILES_EXIST='ERROR[ulu.save_tiles]: tile_set ({}) exists. use force=True to overwrite'
+
 
 #
 # GET META/KWARGS
@@ -70,7 +73,6 @@ def get_config(product,date_index=None,region_index=None):
             'input_products': input_cfig['products'],
             'input_bands': input_cfig['bands'],
             'bands': bands_cfig,
-            'resampler': input_cfig['resampler'],
             'resolution': res,
             'size': size,
             'pad': pad,
@@ -86,7 +88,8 @@ def scene_level_config_list(
         start,
         end,
         region_name=None,
-        data=None):
+        data=None,
+        nb_scenes=False ):
     if data: 
         data=deepcopy(data)
     else:
@@ -98,14 +101,18 @@ def scene_level_config_list(
         tile_key,
         start,
         end )
-    data_list=[]
-    for scene_id in scenes.each.properties.id:
-        scene_data=deepcopy(data)
-        scene_data['scene_id']=scene_id
-        scene_data['date']=h.extract_date(scene_id)
-        data_list.append(scene_data)
-    return data_list
-
+    if nb_scenes:
+        data['nb_scenes']=int(nb_scenes)
+        data['scene_ids']=list(scenes.each.properties.id)
+        return [data]
+    else:
+        data_list=[]
+        for scene_id in scenes.each.properties.id:
+            scene_data=deepcopy(data)
+            scene_data['scene_id']=scene_id
+            scene_data['date']=h.extract_date(scene_id)
+            data_list.append(scene_data)
+        return data_list
 
 
 def config_list(
@@ -113,7 +120,8 @@ def config_list(
         date_index=None,
         region_index=None,
         limit=None,
-        config_list_name=None):
+        config_list_name=None,
+        nb_scenes=False ):
     cfig=get_config(product,date_index,region_index)
     if not config_list_name:
         config_list_name=cfig.get('config_list_name',False)
@@ -143,7 +151,8 @@ def config_list(
                             date['start'],
                             date['end'],
                             region_name,
-                            cfig )
+                            cfig,
+                            nb_scenes )
                 out=mproc.map_with_threadpool(
                     _tile_config_list,
                     tile_keys,
@@ -151,7 +160,8 @@ def config_list(
                 cfig_list.append(h.flatten_list(out))
         print("- {} [{}]".format(timer.stop(),timer.duration()))
         cfig_list=h.flatten_list(cfig_list)
-        if path: h.save_pickle(cfig_list,path)
+        if path: 
+            h.save_pickle(cfig_list,path)
     return cfig_list
 
 
