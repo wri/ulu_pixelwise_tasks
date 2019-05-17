@@ -56,7 +56,6 @@ def save_scenes(
         start_date,
         end_date )
     meta['tile_key']=tile_key
-    print('GET STACK')
     stack=scenes.stack(
         CLOUD_SCORE_BANDS, 
         ctx, 
@@ -65,7 +64,6 @@ def save_scenes(
         bands_axis=-1,
         raster_info=False,
         resampler='bilinear')    
-    print('GET STACK: DONE')
     stack_clouds=masks.stack_cloud_mask(stack)
     scores=stack_clouds.mean(axis=(1,2))
     scene_ids=list(scenes.each.properties.id)
