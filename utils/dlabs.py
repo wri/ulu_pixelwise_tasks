@@ -42,7 +42,7 @@ def get_tile_keys(
             h.save_pickle(tile_keys,path)
         else:
             info['saved']=False
-    info['nb_tiles']=len(tile_keys)
+    info['tile_count']=len(tile_keys)
     if return_info:
         return tile_keys, info
     else:

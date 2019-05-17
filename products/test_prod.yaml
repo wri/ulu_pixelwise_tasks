@@ -53,9 +53,7 @@ model:
     filename: 3cat_14ct_green_2017.hd5
     key: 3cat_14ct_green_2017.hd5
 run:
-    config_list_name: 'sitapur-1'
-    # config_list_name: True
-    size: 496
+    size: 64
     pad: window
     window: 17
     regions:

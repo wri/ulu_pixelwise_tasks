@@ -31,6 +31,19 @@ def cloud_mask(im,bands_first=False,threshold=0.20):
     return np.logical_and(index, (abs(grey) < threshold))
 
 
+def stack_cloud_mask(im,bands_first=False,threshold=0.20):
+    if bands_first:
+        L2=im[:,1,:,:]
+    else:
+        L2=im[:,:,:,1]
+    index=(L2 >= threshold)
+    grey=h.spectral_index(im,1,0,bands_first=bands_first,is_stack=True)
+    index=np.logical_and(index, (abs(grey) < threshold))    
+    grey=h.spectral_index(im,2,1,bands_first=bands_first,is_stack=True)
+    return np.logical_and(index, (abs(grey) < threshold))
+
+
+
 def image_cloud_score(im,bands_first=False,threshold=0.20):
     im=preprocess(im)
     im=cloud_mask(im,bands_first=bands_first,threshold=threshold)

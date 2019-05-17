@@ -39,13 +39,21 @@ def crop(arr,size,bands_first=True):
         return arr
 
 
-def spectral_index(im,b1,b2,eps=EPS,bands_first=False):
-    if bands_first:
-        b1=im[b1]
-        b2=im[b2]
+def spectral_index(im,b1,b2,eps=EPS,bands_first=False,is_stack=False):
+    if is_stack:
+        if bands_first:
+            b1=im[:,b1]
+            b2=im[:,b2]
+        else:
+            b1=im[:,:,:,b1]
+            b2=im[:,:,:,b2]
     else:
-        b1=im[:,:,b1]
-        b2=im[:,:,b2]
+        if bands_first:
+            b1=im[b1]
+            b2=im[b2]
+        else:
+            b1=im[:,:,b1]
+            b2=im[:,:,b2]
     return np.divide(b1-b2,b1+b2+eps).clip(-1.0,1.0)
 
 

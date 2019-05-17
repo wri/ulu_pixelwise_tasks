@@ -117,12 +117,14 @@ def _scenes_job(product,region,force,noisy,limit ):
             nb_scenes,
             start_date,
             end_date)
-        if os.path.isfile(path) and (not force):
-            raise ValueError( SCENES_EXIST.format(path) )
-        else:
-            tile_keys=h.read_pickle(tiles_path)
-            kwargs=info.get_scenes_kwargs(product,region,limit)
-            args_list=[ h.copy_update(kwargs,'tile_key',t) for t in tile_keys ]
+        if os.path.isfile(path):
+            if force:
+                os.remove(path) 
+            else:
+                raise ValueError( SCENES_EXIST.format(path) )
+        tile_keys=h.read_pickle(tiles_path)
+        kwargs=info.get_scenes_kwargs(product,region,limit)
+        args_list=[ h.copy_update(kwargs,'tile_key',t) for t in tile_keys ]
         job=DLJob(
             module_name='ulu.setup',
             method_name='save_scenes',

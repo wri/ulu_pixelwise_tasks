@@ -41,13 +41,13 @@ input:
     products:
         - 'sentinel-2:L1C'
     bands:
-        - blue
-        - green
-        - red
-        - nir
-        - swir1
-        - swir2
-        - alpha
+        - blue    # B2
+        - green   # B3
+        - red     # B4
+        - nir     # B8
+        - swir1   # B11
+        - swir2   # B12
+        - alpha   # mask
 model: 
     # name: optional_model_short_name
     filename: 3cat_14ct_green_2017.hd5
@@ -62,6 +62,4 @@ run:
     start_date: '2017-11-01'
     end_date: '2018-01-01'
     nb_scenes: 5
-
-
 
