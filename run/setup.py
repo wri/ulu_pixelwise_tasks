@@ -30,6 +30,8 @@ MODULES=[
     'dl_jobs'
 ]
 
+
+
 #
 # PUBLIC
 #
@@ -103,8 +105,8 @@ def _tiles_job(product,region,force,noisy,limit):
         return job
 
 
-def _scenes_job(product,region,force,noisy,limit ):
-    tiles_path=info.get_tiles_path( product,region,limit )
+def _scenes_job(product,region,force,noisy,limit):
+    tiles_path=info.get_tiles_path( product,region,limit)
     if not os.path.isfile(tiles_path):
         raise ValueError( TILES_MUST_EXIST.format(tiles_path) )
     else:
@@ -131,6 +133,7 @@ def _scenes_job(product,region,force,noisy,limit ):
             args_list=args_list,
             save_results=path,
             modules=MODULES,
+            cpu_job=True,
             gpus=None,
             platform_job=True,
             noisy=noisy )

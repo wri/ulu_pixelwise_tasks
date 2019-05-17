@@ -46,8 +46,7 @@ def get_scenes_kwargs(product,region,limit):
         'nb_scenes': run_cfig['nb_scenes'],
         'start_date': run_cfig['start_date'],
         'end_date': run_cfig['end_date'],
-        'region': region,
-        'limit': limit }
+        'region': region }
 
 
 

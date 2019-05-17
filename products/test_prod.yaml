@@ -53,7 +53,8 @@ model:
     filename: 3cat_14ct_green_2017.hd5
     key: 3cat_14ct_green_2017.hd5
 run:
-    size: 64
+    scenes: sitapur-5:512:8-5:20171101:20180101.ndjson
+    size: 512
     pad: window
     window: 17
     regions:
