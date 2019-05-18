@@ -9,8 +9,8 @@ from config import CONFIRM_DELETE
 #
 # CREATION TASKS
 #
-def create(*args,**kwargs):
-    job_kwargs=info.get_config(args[0])
+def create(product,**kwargs):
+    job_kwargs=info.get_product_config(product)
     job=DLJob(
         module_name='ulu.product',
         method_name='create',
@@ -20,8 +20,8 @@ def create(*args,**kwargs):
     return job
 
 
-def add_bands(*args,**kwargs):
-    band_configs=info.get_bands_config(args[0])
+def add_bands(product,**kwargs):
+    band_configs=info.get_bands_config(product)
     job=DLJob(
         module_name='ulu.product',
         method_name='add_bands',
@@ -31,9 +31,9 @@ def add_bands(*args,**kwargs):
     return job
 
 
-def add_band(*args,**kwargs):
-    band_configs=info.get_bands_config(args[0])
-    band_index=int(args[1])
+def add_band(product,band_index,**kwargs):
+    band_configs=info.get_bands_config(product)
+    band_index=int(band_index)
     job=DLJob(
         module_name='ulu.product',
         method_name='add_band',
@@ -46,8 +46,8 @@ def add_band(*args,**kwargs):
 #
 # DELETION TASKS
 #
-def delete(*args,**kwargs):
-    job_kwargs=info.get_config(args[0])
+def delete(product,**kwargs):
+    job_kwargs=info.get_product_config(product)
     job_kwargs['cascade']=kwargs.get('cascade',True)
     confirm=kwargs.get('confirm')
     if truthy(confirm):
@@ -57,14 +57,13 @@ def delete(*args,**kwargs):
             kwargs=job_kwargs,
             platform_job=False,
             noisy=kwargs.get('noisy',True),)
+        return job
     else:
         print(CONFIRM_DELETE)
-        job=None
-    return job
 
 
-def remove_bands(*args,**kwargs):
-    band_configs=info.get_bands_config(args[0])
+def remove_bands(product,**kwargs):
+    band_configs=info.get_bands_config(product)
     confirm=kwargs.get('confirm')
     if truthy(confirm):
         job=DLJob(
@@ -73,15 +72,14 @@ def remove_bands(*args,**kwargs):
             args=band_configs,
             platform_job=False,
             noisy=kwargs.get('noisy',True),)
+        return job
     else:
         print(CONFIRM_DELETE)
-        job=None
-    return job
 
 
-def remove_band(*args,**kwargs):
-    band_configs=info.get_bands_config(args[0])
-    band_index=int(args[1])
+def remove_band(product,band_index,**kwargs):
+    band_configs=info.get_bands_config(product)
+    band_index=int(band_index)
     confirm=kwargs.get('confirm')
     if truthy(confirm):
         job=DLJob(
@@ -90,8 +88,7 @@ def remove_band(*args,**kwargs):
             kwargs=band_configs[band_index],
             platform_job=False,
             noisy=kwargs.get('noisy',True),)
+        return job
     else:
         print(CONFIRM_DELETE)
-        job=None
-    return job
 

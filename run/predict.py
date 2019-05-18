@@ -67,8 +67,8 @@ def _predict_job(product,region,force,noisy,limit):
         save_results=results_path,
         results_timestamp=add_timestamp,
         modules=MODULES,
-        cpu_job=True,
-        gpus=None,
+        cpu_job=False,
+        gpus=GPUS,
         platform_job=True,
         noisy=noisy )
     return job

@@ -71,15 +71,9 @@ def dls_fetch(key,dest=None,dls_root=None,storage_root=None):
 @as_json
 @attempt
 @expand_args
-def upload(**kwargs):
-    key=kwargs['key']
-    filename=kwargs.get('filename')
-    local_root=kwargs.get('local_root')
-    dls_root=kwargs.get('dls_root')
+def upload(key,filename,local_root,dls_root,**kwargs):
     key=h.model_key(key=key,dls_root=dls_root)
-    path=h.model_path(
-        filename=filename,
-        local_root=local_root)
+    path=h.model_path(filename=filename,local_root=local_root)
     Storage().set_file(key,path)
     out={
         'ACTION': 'upload',
@@ -94,9 +88,7 @@ def upload(**kwargs):
 @as_json
 @attempt
 @expand_args
-def delete(**kwargs):
-    key=kwargs['key']
-    dls_root=kwargs.get('dls_root')
+def delete(key,dls_root,**kwargs):
     key=h.model_key(key=key,dls_root=dls_root)
     Storage().delete(key)
     out={

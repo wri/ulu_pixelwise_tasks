@@ -23,6 +23,19 @@ RESAMPLER='bilinear'
 
 
 #
+# HELPERS
+#
+def image_data(scene_id,tile_key,input_bands):
+    scene,_=dl.scenes.Scene.from_id(scene_id)
+    tile=dl.scenes.DLTile.from_key(tile_key)
+    return scene.ndarray(
+        bands=input_bands,
+        ctx=tile,
+        resampler=RESAMPLER,
+        raster_info=True)
+
+
+#
 # PREDICTION
 #
 def prediction(
@@ -58,19 +71,8 @@ def category_prediction(preds,mask):
     return lulc
 
 
-
-def image_data(scene_id,tile_key,input_bands):
-    scene,_=dl.scenes.Scene.from_id(scene_id)
-    tile=dl.scenes.DLTile.from_key(tile_key)
-    return scene.ndarray(
-        bands=input_bands,
-        ctx=tile,
-        resampler=RESAMPLER,
-        raster_info=True)
-
-
 #
-# IMAGE
+# PRODUCT
 #
 def product_image(
         product,
@@ -84,6 +86,7 @@ def product_image(
         pad=WINDOW_PADDING,
         cloud_mask=False,
         water_mask=True ):
+    im,rinfo=image_data(scene_id,tile_key,input_bands)
     rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
@@ -104,49 +107,10 @@ def product_image(
     return np.dstack(band_images), rinfo
 
 
-def best_scenes(scene_ids,tile_key,input_bands,nb_scenes):
-    image_data_list=[ (image_data(s,tile_key,input_bands),s) for s in scene_ids ]
-    image_data_list=[ 
-        ( masks.image_cloud_score(im),im,d,s ) for 
-        ((im,d),s) in 
-        image_data_list ]
-    image_data_list=sorted(image_data_list, key=lambda x: x[0])
-    return image_data_list[:nb_scenes]
-
-
-
 
 #
 # JOB METHODS
 #
-PRODUCT_IMAGE_ARGS=[
-    'product',
-    'scene_id',
-    'tile_key',
-    'bands',
-    'input_bands',
-    'window',
-    'model_key',
-    'model_filename',
-    'pad',
-    'cloud_mask',
-    'water_mask' 
-]
-RASTER_META_ARGS=[
-    'scene_id',
-    'tile_key',
-    'region_name',
-    'cloud_mask',
-    'water_mask',
-    'model_key',
-    'date',
-]
-IMAGE_ID_ARGS=[
-    'input_products',
-    'product',
-    'scene_id',
-    'tile_key'
-]
 @as_json
 # @attempt
 @expand_args
@@ -169,9 +133,8 @@ def predict(
         water_mask=True,
         **kwargs):
     image_id=h.image_id(
-        product,
-        product_id,
         input_products,
+        product,
         scene_id,
         tile_key)
     im,rinfo=product_image(
@@ -187,7 +150,7 @@ def predict(
         cloud_mask=cloud_mask,
         water_mask=water_mask )
     meta={
-        'model': model_filename
+        'model': model_filename,
         'scene_id': scene_id,
         'tile_key': tile_key,
         'date': date,

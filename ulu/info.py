@@ -64,6 +64,38 @@ def get_prediction_path(scenes_path,product):
 #
 # GET ARGS/KWARGS
 #
+def get_product_config(product):
+    """TODO"""
+    pass
+
+
+def get_bands_config(product):
+    meta=load.meta(product)
+    product_cfig=meta['product']
+    band_cfigs=meta['bands']
+    band_defaults=meta.get('band_defaults',{})
+    product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
+    cfig_list=[]
+    default_resolution=band_defaults.get(
+        'resolution',
+        h.strip_to_int(product_cfig['resolution'],'m') 
+    )
+    for i,band in enumerate(band_cfigs):
+        b=deepcopy(band_defaults)
+        b['product_id']=product_id
+        b['srcband']=i+1
+        b['resolution']=band.pop('resolution',default_resolution)
+        b.update(band)
+        cfig_list.append(b)
+    return cfig_list
+
+
+def get_model_kwargs(product):
+    model_cfig=load.meta(product,'model')
+    model_cfig['key']=h.model_key(model_cfig['key'],model_cfig.get('dls_root'))
+    return model_cfig
+
+
 def get_scenes_kwargs(product,region,limit):
     meta=load.meta(product)
     input_cfig=meta['input']
@@ -117,47 +149,6 @@ def get_predict_kwargs(product,region,limit):
 
 
 
-
-
-
-
-
-
-
-
-
-#***********************************************************
-#
-# TO BE REFACTORED
-#
-#***********************************************************
-
-
-def get_model_config(product):
-    model_cfig=load.meta(product,'model')
-    model_cfig['key']=h.model_key(model_cfig['key'],model_cfig.get('dls_root'))    
-    return model_cfig
-    
-
-def get_bands_config(product):
-    meta=load.meta(product)
-    product_cfig=meta['product']
-    band_cfigs=meta['bands']
-    band_defaults=meta.get('band_defaults',{})
-    product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
-    cfig_list=[]
-    default_resolution=band_defaults.get(
-        'resolution',
-        h.strip_to_int(product_cfig['resolution'],'m') 
-    )
-    for i,band in enumerate(band_cfigs):
-        b=deepcopy(band_defaults)
-        b['product_id']=product_id
-        b['srcband']=i+1
-        b['resolution']=band.pop('resolution',default_resolution)
-        b.update(band)
-        cfig_list.append(b)
-    return cfig_list
 
 
 
