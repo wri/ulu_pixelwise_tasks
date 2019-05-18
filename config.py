@@ -10,6 +10,7 @@ PRODUCTS_DIR='{}/products'.format(PROJECT_DIR)
 DATA_DIR='{}/data'.format(PROJECT_DIR)
 TILES_DIR='{}/tiles'.format(DATA_DIR)
 SCENES_DIR='{}/scenes'.format(DATA_DIR)
+RESULTS_DIR='{}/results'.format(DATA_DIR)
 REGIONS_DIR='{}/regions'.format(DATA_DIR)
 MODELS_DIR='{}/models'.format(DATA_DIR)
 STORAGE_DIR='/cache'
@@ -31,3 +32,6 @@ WINDOW=17
 WINDOW_PADDING='window'
 RESAMPLER='bilinear'
 CONFIRM_DELETE="ULU.product.delete/remove: pass 'confirm=True' to delete product/band/model"
+WATER_MASK_BAND='water_mask'
+CLOUD_MASK_BAND='cloud_mask'
+

@@ -58,10 +58,9 @@ run:
     pad: window
     window: 17
     regions:
-        - sitapur
         - sitapur_dev
     start_date: '2017-11-01'
-    end_date: '2018-01-01'
+    end_date: '2018-01-15'
     nb_scenes: 5
 
 

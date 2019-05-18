@@ -54,12 +54,12 @@ model:
     key: 3cat_14ct_green_2017.hd5
 run:
     config_list_name: True
-    size: 1024
+    size: 512
     pad: window
     window: 17
     regions:
         - kerala
     start_date: '2017-11-01'
-    end_date: '2018-01-01'
+    end_date: '2018-01-15'
     nb_scenes: 5
 

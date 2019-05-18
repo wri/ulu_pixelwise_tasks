@@ -229,6 +229,13 @@ def copy_update(data,update,value=None):
     return data
 
 
+def update_list(data,value_list,key=None):
+    if key:
+        return [ copy_update(data,key,v) for v in value_list ]
+    else:
+        return [ copy_update(data,v) for v in value_list ]
+
+
 def is_str(value):
     if isinstance(value,str):
         return True

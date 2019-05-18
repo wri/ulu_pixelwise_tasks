@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 ALL='all'
 TILES_EXIST='ERROR[run.setup.tiles]: tile_set ({}) exists. use force=True to overwrite'
 SCENES_EXIST='ERROR[run.setup.scenes]: scenes_set ({}) exists. use force=True to overwrite'
-TILES_MUST_EXIST='ERROR[ulu.scenes]: must save tiles before scenes. ==> run.setup.tiles'
+TILES_REQUIRED='ERROR[ulu.scenes]: must save tiles before scenes. ==> run.setup.tiles'
 
 
 #
@@ -106,19 +106,11 @@ def _tiles_job(product,region,force,noisy,limit):
 
 
 def _scenes_job(product,region,force,noisy,limit):
-    tiles_path=info.get_tiles_path( product,region,limit)
+    tiles_path=info.get_tiles_path(product,region,limit)
     if not os.path.isfile(tiles_path):
-        raise ValueError( TILES_MUST_EXIST.format(tiles_path) )
+        raise ValueError( TILES_REQUIRED.format(tiles_path) )
     else:
-        cfig=load.meta(product,'run')
-        nb_scenes=cfig['nb_scenes']
-        start_date=cfig['start_date']
-        end_date=cfig['end_date']
-        path=h.scenes_path(
-            tiles_path,
-            nb_scenes,
-            start_date,
-            end_date)
+        path=info.get_scenes_path(tiles_path,product)
         if os.path.isfile(path):
             if force:
                 os.remove(path) 
@@ -126,7 +118,7 @@ def _scenes_job(product,region,force,noisy,limit):
                 raise ValueError( SCENES_EXIST.format(path) )
         tile_keys=h.read_pickle(tiles_path)
         kwargs=info.get_scenes_kwargs(product,region,limit)
-        args_list=[ h.copy_update(kwargs,'tile_key',t) for t in tile_keys ]
+        args_list=h.update_list(kwargs,tile_keys,'tile_key')
         job=DLJob(
             module_name='ulu.setup',
             method_name='save_scenes',

@@ -27,14 +27,12 @@ CLOUD_SCORE_BANDS="blue green red"
 # @attempt
 @expand_args
 def save_tiles(path,product,region,limit=None):
-    print(path,product,region)
     tile_keys,meta=dlabs.get_tile_keys(
         path=path,
         product=product,
         region=region,
         limit=limit,
         return_info=True)
-    print(tile_keys)
     meta['action']='save_tiles'
     return meta
 

@@ -154,46 +154,22 @@ IMAGE_ID_ARGS=[
 @as_json
 # @attempt
 @expand_args
-def predict(*args,**kwargs):
+def predict(product,product_id,input_products,**kwargs):
     """ PREDICTION METHOD """
-    product_id=kwargs.pop('product_id')
     meta=h.extract_kwargs(kwargs,RASTER_META_ARGS)
     meta['cloud_mask']=str(meta['cloud_mask'])
     meta['water_mask']=str(meta['water_mask'])
-    nb_scenes=kwargs.pop('nb_scenes',False)
-    prod_im_kwargs=h.extract_kwargs(
-        kwargs,
-        PRODUCT_IMAGE_ARGS )
-    if nb_scenes:
-        scene_list=best_scenes(
-            kwargs['scene_ids'],
-            kwargs['tile_key'],
-            kwargs['input_bands'],
-            nb_scenes)
-        out_list=[]
-        for cs,im,rinfo,scene_id in scene_list:
-            if isinstance(cs,np.ma.core.MaskedArray) or isinstance(cs,np.ndarray):
-                if not cs.shape:
-                    cs=cs.item()
-                else:
-                    raise ValueError('ULU.predict: invalid cloud_score. {}'.format(cs))
-            m=meta.copy()
-            m['cloud_score']=cs
-            m['scene_id']=scene_id
-            m['date']=h.extract_date(scene_id)
-            im,rinfo=product_image(im=im,rinfo=rinfo,**prod_im_kwargs)
-            image_id=h.image_id(
-                    prods=kwargs['input_products'],
-                    pname=kwargs['product'],
-                    sid=scene_id,
-                    tkey=kwargs['tile_key'] )
-            out_list.append(_upload_scene(product_id,image_id,im,rinfo,m))
-        return out_list
-    else:
-        image_id_args=[kwargs[k] for k in IMAGE_ID_ARGS]
-        image_id=h.image_id(*image_id_args)
-        im,rinfo=product_image(**prod_im_kwargs)
-        return _upload_scene(product_id,image_id,im,rinfo,meta)
+    image_id=h.image_id(
+        product,product_id,input_products,scene_id,tile_key)
+    #
+    #
+    #  HERE NEED TO ADD INPUT_PRODUCTS
+    #
+    #
+    #
+    #
+    im,rinfo=product_image(**prod_im_kwargs)
+    return _upload_scene(product_id,image_id,im,rinfo,meta)
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):

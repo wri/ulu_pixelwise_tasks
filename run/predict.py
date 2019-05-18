@@ -1,8 +1,20 @@
 from __future__ import print_function
+import os
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from dl_jobs.job import DLJob
+import dl_jobs.nd_json as ndj
+import utils.helpers as h
+import utils.load as load
 import ulu.info as info
+
+
+from pprint import pprint
+#
+# CONSTANTS
+#
+ALL='all'
+SCENES_REQUIRED='ERROR[ulu.predict]: must save scenes before predicting. ==> run.setup.scenes'
 
 
 #
@@ -24,38 +36,41 @@ GPUS=1
 #
 # TASKS
 #
-def task(*args,**kwargs):
-    product=args[0]
-    nb_scenes=kwargs.get('nb_scenes',False)
-    hard_limit=kwargs.get('hard_limit',0)
-    if hard_limit: 
-        hard_limit=int(hard_limit)
-        limit=hard_limit
+def task(product,region=ALL,**kwargs):
+    force=h.truthy(kwargs.get('force',False))
+    noisy=h.truthy(kwargs.get('noisy',True))
+    limit=kwargs.get('limit',False)
+    if region==ALL:
+        regions=load.meta(product,'run','regions')
+        jobs=[]
+        for region in regions:
+            jobs.append(_predict_job(product,region,force,noisy,limit))
+        return jobs
     else:
-        limit=kwargs.get('limit',False)
-        if limit: limit=int(limit)
-    date_index=kwargs.get('date',None)
-    region_index=kwargs.get('region',None)
-    args_list=info.config_list(
-        product,
-        date_index=date_index,
-        region_index=region_index,
-        limit=limit,
-        nb_scenes=nb_scenes )
-    if hard_limit:
-        args_list=args_list[:hard_limit]
+        return _predict_job(product,region,force,noisy,limit)
+
+
+
+def _predict_job(product,region,force,noisy,limit):
+    tiles_path=info.get_tiles_path(product,region,limit)
+    scenes_path=info.get_scenes_path(tiles_path,product)
+    results_path, add_timestamp=info.get_prediction_path(tiles_path,product)
+    if not os.path.isfile(scenes_path):
+        raise ValueError( SCENES_REQUIRED.format(scenes_path) )
+    scenes_args_list=ndj.read(scenes_path)
+    kwargs=info.get_predict_kwargs(product,region,limit)
+    args_list=h.update_list(kwargs,scenes_args_list)
     job=DLJob(
         module_name='ulu.prediction',
         method_name='predict',
         args_list=args_list,
+        save_results=results_path,
+        results_timestamp=add_timestamp,
         modules=MODULES,
-        requirements=REQUIREMENTS,
-        data=DATA,
-        gpus=GPUS,
+        cpu_job=True,
+        gpus=None,
         platform_job=True,
-        dl_image=kwargs.get('dl_image'),
-        noisy=kwargs.get('noisy'),
-        log=False )
+        noisy=noisy )
     return job
 
 
