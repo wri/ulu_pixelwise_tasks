@@ -1,0 +1,14 @@
+default_method: task
+# dl_image: us.gcr.io/dl-ci-cd/images/tasks/public/py2-gpu/default:v2019.04.18-13-g565aebde
+# dl_image: us.gcr.io/dl-ci-cd/images/tasks/public/py2/default:v2019.04.18-13-g565aebde
+# dl_image: us.gcr.io/dl-ci-cd/images/tasks/org/wri/bguzder/py2-gpu-tf-1.1.0:v0.1
+# dl_image: us.gcr.io/dl-ci-cd/images/tasks/org/wri/bguzder/py2-gpu-tf-1.4.0:v0.1
+dl_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.6-gpu/default:v2019.04.18-13-g565aebde
+dls_root: dl_jobs
+is_dev: true
+log: true
+log_dir: logs
+module_dir: run
+noisy: true
+print_logs: true
+suppress: ['DeprecationWarning']

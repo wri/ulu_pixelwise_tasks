@@ -96,6 +96,7 @@ def get_predict_kwargs(product,region,limit):
             'product_id': product_id,
             'title': product_title,
             'description': product_cfig.get('description','name'),
+            'bands': [ b['name'] for b in bands_cfig ],
             'model': h.model_name(**model_cfig),
             'model_filename': model_cfig.get('filename'),
             'model_key': model_cfig.get('key'),

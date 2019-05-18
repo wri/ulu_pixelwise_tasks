@@ -83,11 +83,7 @@ def product_image(
         model_filename,
         pad=WINDOW_PADDING,
         cloud_mask=False,
-        water_mask=True,
-        im=None,
-        rinfo=None ):
-    if im is None:
-        im,rinfo=image_data(scene_id,tile_key,input_bands)
+        water_mask=True ):
     rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
@@ -154,21 +150,53 @@ IMAGE_ID_ARGS=[
 @as_json
 # @attempt
 @expand_args
-def predict(product,product_id,input_products,**kwargs):
-    """ PREDICTION METHOD """
-    meta=h.extract_kwargs(kwargs,RASTER_META_ARGS)
-    meta['cloud_mask']=str(meta['cloud_mask'])
-    meta['water_mask']=str(meta['water_mask'])
+def predict(
+        product,
+        product_id,
+        input_products,
+        tile_key,
+        scene_id,
+        bands,
+        input_bands,
+        window,
+        model_key,
+        model_filename,
+        pad,
+        date,
+        cloud_score,
+        resolution,
+        cloud_mask=False,
+        water_mask=True,
+        **kwargs):
     image_id=h.image_id(
-        product,product_id,input_products,scene_id,tile_key)
-    #
-    #
-    #  HERE NEED TO ADD INPUT_PRODUCTS
-    #
-    #
-    #
-    #
-    im,rinfo=product_image(**prod_im_kwargs)
+        product,
+        product_id,
+        input_products,
+        scene_id,
+        tile_key)
+    im,rinfo=product_image(
+        product=product,
+        scene_id=scene_id,
+        tile_key=tile_key,
+        bands=bands,
+        input_bands=input_bands,
+        window=window,
+        model_key=model_key,
+        model_filename=model_filename,
+        pad=pad,
+        cloud_mask=cloud_mask,
+        water_mask=water_mask )
+    meta={
+        'model': model_filename
+        'scene_id': scene_id,
+        'tile_key': tile_key,
+        'date': date,
+        'region_name': region,
+        'resolution': resolution,
+        'cloud_score': cloud_score,
+        'cloud_mask': str(cloud_mask),
+        'water_mask': str(water_mask)
+    }
     return _upload_scene(product_id,image_id,im,rinfo,meta)
 
 
