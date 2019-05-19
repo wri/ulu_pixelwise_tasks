@@ -12,31 +12,38 @@ import utils.dlabs as dlabs
 @as_json
 @attempt
 @expand_args
-def delete(**kwargs):
-    out=Catalog().remove_product(
-        kwargs['product_id'], 
-        add_namespace=True, 
-        cascade=kwargs['cascade'] )
+def create(
+        product_id,
+        title,
+        description,
+        read,
+        start_datetime,
+        end_datetime,
+        resolution,
+        notes, 
+        **kwargs):
+    resolution="{}m".format(resolution)
+    notes=h.notes(notes)
+    out=Catalog().add_product(
+        product_id,
+        title,
+        description,
+        read,
+        start_datetime,
+        end_datetime,
+        resolution,
+        notes )
     return out
 
 
 
-PRODUCT_KWARGS=[
-    'product_id',
-    'title',
-    'description',
-]
 @as_json
 @attempt
 @expand_args
-def create(**kwargs):
-    prod_kwargs=h.extract_kwargs(kwargs,PRODUCT_KWARGS)
-    start,end=h.start_end_datetimes(kwargs.get('dates'))
-    prod_kwargs['resolution']="{}m".format(kwargs['resolution'])
-    prod_kwargs['start_datetime']=start
-    prod_kwargs['end_datetime']=end
-    prod_kwargs['notes']=h.notes(kwargs,exclude=PRODUCT_KWARGS)
-    out=Catalog().add_product( **prod_kwargs )
+def delete(product_id,cascade):
+    out=Catalog().remove_product(
+        product_id=product_id, 
+        cascade=cascade )
     return out
 
 
@@ -47,10 +54,9 @@ def create(**kwargs):
 @as_json
 @attempt
 @expand_args
-def add_bands(*args):
+def add_bands(bands_kwargs_list):
     out=[]
-    for kwargs in args:
-        kwargs['return_as_dict']=True
+    for kwargs in bands_kwargs_list:
         out.append(add_band(kwargs))
     return out 
 
@@ -71,7 +77,6 @@ def add_band(**kwargs):
 def remove_bands(*args):
     out=[]
     for kwargs in args:
-        kwargs['return_as_dict']=True
         out.append(remove_band(kwargs))
     return out 
 

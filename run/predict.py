@@ -61,7 +61,7 @@ def _predict_job(product,region,force,noisy,limit):
     kwargs=info.get_predict_kwargs(product,region,limit)
     args_list=h.update_list(kwargs,scenes_args_list)
     job=DLJob(
-        module_name='ulu.prediction',
+        module_name='ulu.predict',
         method_name='predict',
         args_list=args_list,
         save_results=results_path,

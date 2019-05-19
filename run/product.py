@@ -10,7 +10,7 @@ from config import CONFIRM_DELETE
 # CREATION TASKS
 #
 def create(product,**kwargs):
-    job_kwargs=info.get_product_config(product)
+    job_kwargs=info.get_product_kwargs(product)
     job=DLJob(
         module_name='ulu.product',
         method_name='create',
@@ -21,7 +21,7 @@ def create(product,**kwargs):
 
 
 def add_bands(product,**kwargs):
-    band_configs=info.get_bands_config(product)
+    band_configs=info.get_bands_kwargs_list(product)
     job=DLJob(
         module_name='ulu.product',
         method_name='add_bands',
@@ -32,7 +32,7 @@ def add_bands(product,**kwargs):
 
 
 def add_band(product,band_index,**kwargs):
-    band_configs=info.get_bands_config(product)
+    band_configs=info.get_bands_kwargs_list(product)
     band_index=int(band_index)
     job=DLJob(
         module_name='ulu.product',
@@ -47,7 +47,7 @@ def add_band(product,band_index,**kwargs):
 # DELETION TASKS
 #
 def delete(product,**kwargs):
-    job_kwargs=info.get_product_config(product)
+    job_kwargs=info.get_product_kwargs(product)
     job_kwargs['cascade']=kwargs.get('cascade',True)
     confirm=kwargs.get('confirm')
     if truthy(confirm):
@@ -63,7 +63,7 @@ def delete(product,**kwargs):
 
 
 def remove_bands(product,**kwargs):
-    band_configs=info.get_bands_config(product)
+    band_configs=info.get_bands_kwargs_list(product)
     confirm=kwargs.get('confirm')
     if truthy(confirm):
         job=DLJob(
@@ -78,7 +78,7 @@ def remove_bands(product,**kwargs):
 
 
 def remove_band(product,band_index,**kwargs):
-    band_configs=info.get_bands_config(product)
+    band_configs=info.get_bands_kwargs_list(product)
     band_index=int(band_index)
     confirm=kwargs.get('confirm')
     if truthy(confirm):

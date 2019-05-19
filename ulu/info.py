@@ -61,21 +61,94 @@ def get_prediction_path(scenes_path,product):
     return path, add_timestamp
 
 
+
+
 #
 # GET ARGS/KWARGS
 #
-def get_product_config(product):
-    """TODO"""
-    pass
+def get_product_kwargs(product,date_index=None,region_index=None):
+    """ product.create
+    Catalog.product kwargs: 
+    + product_id (str) – (Required) A unique name for this product. In the created product a namespace consisting of your user id (e.g. “ae60fc891312ggadc94ade8062213b0063335a3c:”) or your organization id (e.g., “yourcompany:”) will be prefixed to this, if it doesn’t already have one, in order to make the id globally unique.
+    + title (str) – (Required) Official product title.
+    + description (str) – (Required) Information about the product, why it exists, and what it provides.
+    + add_namespace (bool) – Add your user namespace to the product_id. Deprecated
+    + read (list(str)) – A list of groups, or user hashes to give read access to.
+    - spectral_bands (int) – Number of spectral bands the product has.
+    - native_bands (list(str)) – A list of the names of the native bands of this product (most applicable to satellite sensors).
+    + start_datetime (str) – ISO8601 compliant date string, indicating start of product data.
+    + end_datetime (str) – ISO8601 compliant date string, indicating end of product data.
+    * notes (str) – Any notes to relay about the product.
+    - orbit (str) – Type of orbit (satellite only).
+    - processing_level (str) – Way in which raw data has been processed if any.
+    + resolution (str) – Pixel density of the data, provide units.
+    - revisit (str) – How often an AOI can expect updated data.
+    - sensor (str) – Name of the sensor used.
+    - swath (str) – How large an area the sensor captures at a given time.
+    - writers (list(str)) – A list of groups, or user hashes to give read access to.
+    """
+    meta=load.meta(product)
+    run_cfig=meta['run']
+    product_cfig=meta['product']
+    model_cfig=meta['model']
+    input_cfig=meta['input']
+    bands_cfig=get_bands_config(product)
+    name=product_cfig['name']
+    product_id=product_cfig.get(
+        'product_id',
+        h.product_id(name,product_cfig.get('owner')))
+    product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
+    res,size,pad=h.resolution_size_padding(meta=meta)
+    product_bands=[ b['name'] for b in bands_cfig ]
+    regions=h.extract_list(run_cfig['regions'],region_index)
+    return {
+            'product_id': product_id,
+            'title': product_title,
+            'description': product_cfig.get('description',name),
+            'read': product_cfig.get('read'),
+            'start_datetime': run_cfig['start_date'],
+            'end_datetime': run_cfig['end_date'],
+            'resolution': res,
+            'notes': { 
+                'product': name,
+                'regions': regions,
+                'start_datetime': run_cfig['start_date'],
+                'end_datetime': run_cfig['end_date'],
+                'resolution': res,
+                'size': size,
+                'pad': pad,
+                'water_mask': 'water_mask' in product_bands,
+                'cloud_mask': 'cloud_mask' in product_bands,
+                'bands': bands_cfig,
+                'input_products': input_cfig['products'],
+                'input_bands': input_cfig['bands'],
+                'window': run_cfig['window'],
+                'model_filename': model_cfig.get('filename')
+            }
+        }
 
 
-def get_bands_config(product):
+
+def get_delete_product_kwargs(product,cascade):
+    """ product.delete """
+    product_cfig=load.meta(product,'product')
+    product_id=product_cfig.get(
+        'product_id',
+        h.product_id(name,product_cfig.get('owner')))
+    return {
+            'product_id': product_id,
+            'cascade': cascade
+        }
+
+
+def get_bands_kwargs_list(product):
+    """ product.add_bands """
     meta=load.meta(product)
     product_cfig=meta['product']
     band_cfigs=meta['bands']
     band_defaults=meta.get('band_defaults',{})
     product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
-    cfig_list=[]
+    bands_kwargs_list=[]
     default_resolution=band_defaults.get(
         'resolution',
         h.strip_to_int(product_cfig['resolution'],'m') 
@@ -86,17 +159,19 @@ def get_bands_config(product):
         b['srcband']=i+1
         b['resolution']=band.pop('resolution',default_resolution)
         b.update(band)
-        cfig_list.append(b)
-    return cfig_list
+        bands_kwargs_list.append(b)
+    return bands_kwargs_list
 
 
 def get_model_kwargs(product):
+    """ model.upload/delete """
     model_cfig=load.meta(product,'model')
     model_cfig['key']=h.model_key(model_cfig['key'],model_cfig.get('dls_root'))
     return model_cfig
 
 
 def get_scenes_kwargs(product,region,limit):
+    """ setup.scenes """
     meta=load.meta(product)
     input_cfig=meta['input']
     run_cfig=meta['run']
@@ -109,13 +184,16 @@ def get_scenes_kwargs(product,region,limit):
 
 
 def get_predict_kwargs(product,region,limit):
+    """ predict.predict """
     meta=load.meta(product)
     run_cfig=meta['run']
     product_cfig=meta['product']
     model_cfig=meta['model']
     input_cfig=meta['input']
     bands_cfig=meta['bands']
-    product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
+    product_id=product_cfig.get(
+        'product_id',
+        h.product_id(name,product_cfig.get('owner')))
     product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     product_bands=[ b['name'] for b in bands_cfig ]
     res,size,pad=h.resolution_size_padding(meta=meta)

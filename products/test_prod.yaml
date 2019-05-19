@@ -3,6 +3,7 @@ product:
     name: test_prod
     description: description of test product
     resolution: 5m
+    read: 'org:wri'
 bands:
     - name: scores
       description: output probablity from model
