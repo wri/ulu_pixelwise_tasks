@@ -25,14 +25,14 @@ def create(
     resolution="{}m".format(resolution)
     notes=h.notes(notes)
     out=Catalog().add_product(
-        product_id,
-        title,
-        description,
-        read,
-        start_datetime,
-        end_datetime,
-        resolution,
-        notes )
+        product_id=product_id,
+        title=title,
+        description=description,
+        read=read,
+        start_datetime=start_datetime,
+        end_datetime=end_datetime,
+        resolution=resolution,
+        notes=notes )
     return out
 
 
@@ -51,13 +51,12 @@ def delete(product_id,cascade):
 #
 # BANDS
 #
+from pprint import pprint
 @as_json
 @attempt
 @expand_args
-def add_bands(bands_kwargs_list):
-    out=[]
-    for kwargs in bands_kwargs_list:
-        out.append(add_band(kwargs))
+def add_bands(*bands):
+    out=[ add_band(b) for b in bands ]
     return out 
 
 
@@ -74,10 +73,8 @@ def add_band(**kwargs):
 @as_json
 @attempt
 @expand_args
-def remove_bands(*args):
-    out=[]
-    for kwargs in args:
-        out.append(remove_band(kwargs))
+def remove_bands(*bands):
+    out=[ remove_band(b) for b in bands ]
     return out 
 
 

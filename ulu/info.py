@@ -92,11 +92,11 @@ def get_product_kwargs(product,date_index=None,region_index=None):
     product_cfig=meta['product']
     model_cfig=meta['model']
     input_cfig=meta['input']
-    bands_cfig=get_bands_config(product)
+    bands_cfig=meta['bands']
     name=product_cfig['name']
     product_id=product_cfig.get(
         'product_id',
-        h.product_id(name,product_cfig.get('owner')))
+        h.product_id(product_cfig['name'],product_cfig.get('owner')))
     product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     res,size,pad=h.resolution_size_padding(meta=meta)
     product_bands=[ b['name'] for b in bands_cfig ]
@@ -119,7 +119,6 @@ def get_product_kwargs(product,date_index=None,region_index=None):
                 'pad': pad,
                 'water_mask': 'water_mask' in product_bands,
                 'cloud_mask': 'cloud_mask' in product_bands,
-                'bands': bands_cfig,
                 'input_products': input_cfig['products'],
                 'input_bands': input_cfig['bands'],
                 'window': run_cfig['window'],
@@ -131,10 +130,10 @@ def get_product_kwargs(product,date_index=None,region_index=None):
 
 def get_delete_product_kwargs(product,cascade):
     """ product.delete """
-    product_cfig=load.meta(product,'product')
-    product_id=product_cfig.get(
+    cfig=load.meta(product,'product')
+    product_id=cfig.get(
         'product_id',
-        h.product_id(name,product_cfig.get('owner')))
+        h.product_id(cfig['name'],cfig.get('owner')))
     return {
             'product_id': product_id,
             'cascade': cascade
@@ -158,6 +157,7 @@ def get_bands_kwargs_list(product):
         b['product_id']=product_id
         b['srcband']=i+1
         b['resolution']=band.pop('resolution',default_resolution)
+        b['read']=b.get('read',product_cfig.get('read'))
         b.update(band)
         bands_kwargs_list.append(b)
     return bands_kwargs_list
@@ -193,7 +193,8 @@ def get_predict_kwargs(product,region,limit):
     bands_cfig=meta['bands']
     product_id=product_cfig.get(
         'product_id',
-        h.product_id(name,product_cfig.get('owner')))
+        h.product_id(product_cfig['name'],product_cfig.get('owner')))
+    product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     product_bands=[ b['name'] for b in bands_cfig ]
     res,size,pad=h.resolution_size_padding(meta=meta)

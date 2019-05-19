@@ -47,8 +47,9 @@ def add_band(product,band_index,**kwargs):
 # DELETION TASKS
 #
 def delete(product,**kwargs):
-    job_kwargs=info.get_product_kwargs(product)
-    job_kwargs['cascade']=kwargs.get('cascade',True)
+    job_kwargs=info.get_delete_product_kwargs(
+        product,
+        kwargs.get('cascade',True))
     confirm=kwargs.get('confirm')
     if truthy(confirm):
         job=DLJob(

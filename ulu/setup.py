@@ -16,15 +16,10 @@ CLOUD_SCORE_BANDS="blue green red"
 
 
 #
-# GET META/KWARGS
-#
-
-
-#
 # JOBS
 #
 @as_json
-# @attempt
+@attempt
 @expand_args
 def save_tiles(path,product,region,limit=None):
     tile_keys,meta=dlabs.get_tile_keys(
@@ -39,7 +34,7 @@ def save_tiles(path,product,region,limit=None):
 
 
 @as_json
-# @attempt
+@attempt
 @expand_args
 def save_scenes(
         input_products,
