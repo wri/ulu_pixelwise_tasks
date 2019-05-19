@@ -69,9 +69,9 @@ def dls_fetch(key,dest=None,dls_root=None,storage_root=None):
 # MODEL
 #
 @as_json
-@attempt
+# @attempt
 @expand_args
-def upload(key,filename,local_root,dls_root,**kwargs):
+def upload(key,filename,local_root=None,dls_root=None,**kwargs):
     key=h.model_key(key=key,dls_root=dls_root)
     path=h.model_path(filename=filename,local_root=local_root)
     Storage().set_file(key,path)
