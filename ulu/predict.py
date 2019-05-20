@@ -12,6 +12,8 @@ from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
 import ulu.model
 import tensorflow as tf
+from mproc import MPList
+
 
 from pprint import pprint
 #
@@ -45,6 +47,11 @@ def prediction(
         window=WINDOW,
         pad=WINDOW_PADDING,
         prep_image=True):
+    # # FAKE
+    # import time
+    # size=arr.shape[1]-2*h.get_padding(pad,window)
+    # time.sleep(1)
+    # return np.random.rand(size,size,3)
     generator=ImageSampleGenerator(
         arr,
         pad=pad,
@@ -90,14 +97,23 @@ def product_image(
     rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
-    preds=prediction(
+    """ multiprocess """
+    mp_list=MPList()
+    mp_list.append(
+        prediction,
         im.astype(DTYPE),
         model_key=model_key,
         model_filename=model_filename,
         window=window,
-        pad=pad)
+        pad=pad )
+    mp_list.append(
+        masks.cloud_score,
+        im,
+        window=window,
+        pad=pad )
+    preds,(cmask,cscores)=mp_list.run()
+    """" end-multiprocess """
     lulc=category_prediction(preds,blank_mask)
-    cmask,cscores=masks.cloud_score(im,window=window,pad=pad)
     cscores=h.crop(cscores,pad)
     band_images=[ preds.max(axis=-1), lulc, cscores ]
     if water_mask:
@@ -117,6 +133,7 @@ def product_image(
 def predict(
         product,
         product_id,
+        region,
         input_products,
         tile_key,
         scene_id,
@@ -129,9 +146,9 @@ def predict(
         date,
         cloud_score,
         resolution,
+        scene_set,
         cloud_mask=False,
-        water_mask=True,
-        **kwargs):
+        water_mask=True ):
     image_id=h.image_id(
         input_products,
         product,
@@ -157,6 +174,7 @@ def predict(
         'region_name': region,
         'resolution': resolution,
         'cloud_score': cloud_score,
+        'scene_set': scene_set,
         'cloud_mask': str(cloud_mask),
         'water_mask': str(water_mask)
     }

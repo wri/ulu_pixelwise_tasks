@@ -194,21 +194,15 @@ def get_predict_kwargs(product,region,limit):
     product_id=product_cfig.get(
         'product_id',
         h.product_id(product_cfig['name'],product_cfig.get('owner')))
-    product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
-    product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
     product_bands=[ b['name'] for b in bands_cfig ]
-    res,size,pad=h.resolution_size_padding(meta=meta)
+    res,_,pad=h.resolution_size_padding(meta=meta)
     tiles_path=get_tiles_path(product,region,limit)
     scenes_path=get_scenes_path(tiles_path,product)
-    tile_set=os.path.basename(tiles_path)
     scene_set=os.path.basename(scenes_path)
     return {
             'product': product_cfig['name'],
             'product_id': product_id,
-            'title': product_title,
-            'description': product_cfig.get('description','name'),
             'bands': [ b['name'] for b in bands_cfig ],
-            'model': h.model_name(**model_cfig),
             'model_filename': model_cfig.get('filename'),
             'model_key': model_cfig.get('key'),
             'window': run_cfig['window'],
@@ -217,9 +211,7 @@ def get_predict_kwargs(product,region,limit):
             'input_products': input_cfig['products'],
             'input_bands': input_cfig['bands'],
             'resolution': res,
-            'size': size,
             'pad': pad,
-            'tile_set': tile_set,
             'scene_set': scene_set
         }
 
