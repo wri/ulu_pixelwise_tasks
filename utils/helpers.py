@@ -22,7 +22,6 @@ EXTRACT_DATE_RGX=r'\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])'
 DEFAULT_DATE='9999-12-31'
 YYYY_MM_DD='%Y-%m-%d'
 AS_DATETIME=False
-FALSEY=['false','none','no','null','f','n','0']
 CONFIG_LIST_TMPL="{}_{}:{}"
 SEP_RGX=r'[_\-\.\,/\ ]'
 
@@ -219,44 +218,6 @@ def read_pickle(path):
 #
 # PYTHON
 #
-def copy_update(data,update,value=None):
-    data=deepcopy(data)
-    if update:
-        if isinstance(update,dict):
-            data.update(update)
-        else: 
-            data[update]=value
-    return data
-
-
-def update_list(data,value_list,key=None):
-    if key:
-        return [ copy_update(data,key,v) for v in value_list ]
-    else:
-        return [ copy_update(data,v) for v in value_list ]
-
-
-def is_str(value):
-    if isinstance(value,str):
-        return True
-    else:
-        try: 
-            is_a_str=isinstance(out,unicode)
-        except:
-            is_a_str=False
-        return is_a_str
-
-
-def truthy(value):
-    if isinstance(value,bool) or isinstance(value,int) or (value is None):
-        return value
-    elif isinstance(value,str):
-        value=value.lower()
-        return value not in FALSEY
-    else:
-        raise ValueError('truthy: value must be str,int,bool')
-
-
 def first(value):
     if isinstance(value,tuple) or isinstance(value,list):
         return value[0]

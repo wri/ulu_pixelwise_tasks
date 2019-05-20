@@ -7,6 +7,7 @@ from pprint import pprint
 import descarteslabs as dl
 import utils.helpers as h
 import utils.load as load
+import dl_jobs.helpers as dh
 #
 # PUBLIC
 #
@@ -50,7 +51,7 @@ def get_tile_keys(
 
 
 def get_scenes(products,aoi,start_date,end_date):
-    if h.is_str(aoi):
+    if dh.is_str(aoi):
         aoi=dl.scenes.DLTile.from_key(aoi)
     return dl.scenes.search(
         products=products,

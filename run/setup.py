@@ -7,9 +7,8 @@ import utils.helpers as h
 import utils.load as load
 import ulu.info as info
 from dl_jobs.job import DLJob
+import dl_jobs.helpers as dh
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
 #
 # CONSTANTS
 #
@@ -49,8 +48,8 @@ def product(*args,**kwargs):
 
 def tiles(product,region=ALL,**kwargs):
     """ save tiles """
-    force=h.truthy(kwargs.get('force',False))
-    noisy=h.truthy(kwargs.get('noisy',True))
+    force=dh.truthy(kwargs.get('force',False))
+    noisy=dh.truthy(kwargs.get('noisy',True))
     limit=kwargs.get('limit',False)
     if limit: 
         limit=int(limit)
@@ -66,8 +65,8 @@ def tiles(product,region=ALL,**kwargs):
 
 def scenes(product,region=ALL,**kwargs):
     """ save scenes """
-    force=h.truthy(kwargs.get('force',False))
-    noisy=h.truthy(kwargs.get('noisy',True))
+    force=dh.truthy(kwargs.get('force',False))
+    noisy=dh.truthy(kwargs.get('noisy',True))
     limit=kwargs.get('limit',False)
     if limit: 
         limit=int(limit)
@@ -118,7 +117,7 @@ def _scenes_job(product,region,force,noisy,limit):
                 raise ValueError( SCENES_EXIST.format(path) )
         tile_keys=h.read_pickle(tiles_path)
         kwargs=info.get_scenes_kwargs(product,region,limit)
-        args_list=h.update_list(kwargs,tile_keys,'tile_key')
+        args_list=dh.update_list(kwargs,tile_keys,'tile_key')
         job=DLJob(
             module_name='ulu.setup',
             method_name='save_scenes',

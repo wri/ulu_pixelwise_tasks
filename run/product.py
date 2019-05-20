@@ -2,6 +2,7 @@ from __future__ import print_function
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from dl_jobs.job import DLJob
+import dl_jobs.helpers as dh
 from utils.helpers import truthy
 import ulu.info as info
 from config import CONFIRM_DELETE

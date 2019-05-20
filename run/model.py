@@ -5,7 +5,7 @@ from dl_jobs.job import DLJob
 import utils.helpers as h
 import ulu.info as info
 from config import CONFIRM_DELETE
-
+import dl_jobs.helpers as dh
 #
 # CREATION TASKS
 #
@@ -28,7 +28,7 @@ def upload(product,**kwargs):
 def delete(product,**kwargs):
     job_kwargs=info.get_model_kwargs(product)
     confirm=kwargs.get('confirm')
-    if h.truthy(confirm):
+    if dh.truthy(confirm):
         job=DLJob(
             module_name='ulu.model',
             method_name='delete',

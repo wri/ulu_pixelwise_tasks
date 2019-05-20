@@ -55,11 +55,16 @@ model:
     key: 3cat_14ct_green_2017.hd5
 run:
     # scenes: sitapur-5:512:8-5:20171101:20180101.ndjson
-    size: 8
-    pad: window
-    window: 17
+    #** local-dev 
     regions:
         - sitapur_dev_2
+    size: 8
+    #** dl-dev 
+    # regions:
+    #     - sitapur_dev
+    # size: 512
+    pad: window
+    window: 17
     start_date: '2017-11-01'
     end_date: '2018-01-15'
     nb_scenes: 5

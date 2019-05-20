@@ -9,6 +9,7 @@ import utils.load as load
 import utils.masks as masks
 from config import TILES_DIR
 from dl_jobs.utils import Timer
+import dl_jobs.helpers as dh
 #
 # CONSTANTS
 #
@@ -66,19 +67,8 @@ def save_scenes(
         zip(scene_ids,scores)]
     sorted(scene_scores,key=lambda d: d['cloud_score'])
     scene_scores=scene_scores[:nb_scenes]
-    scene_scores=[ h.copy_update(meta,d) for d in scene_scores ]
+    scene_scores=[ dh.copy_update(meta,d) for d in scene_scores ]
     return scene_scores
 
-
-
-
-def copy_update(data,update,value=None):
-    data=deepcopy(data)
-    if update:
-        if isinstance(update,dict):
-            data.update(update)
-        else: 
-            data[update]=value
-    return data
 
 

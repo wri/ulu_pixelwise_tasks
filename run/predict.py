@@ -7,6 +7,7 @@ import dl_jobs.nd_json as ndj
 import utils.helpers as h
 import utils.load as load
 import ulu.info as info
+import dl_jobs.helpers as dh
 #
 # CONSTANTS
 #
@@ -34,9 +35,9 @@ GPUS=1
 # TASKS
 #
 def task(product,region=ALL,**kwargs):
-    force=h.truthy(kwargs.get('force',False))
-    noisy=h.truthy(kwargs.get('noisy',True))
-    cpu_job=h.truthy(kwargs.get('cpu',False))
+    force=dh.truthy(kwargs.get('force',False))
+    noisy=dh.truthy(kwargs.get('noisy',True))
+    cpu_job=dh.truthy(kwargs.get('cpu',False))
     limit=kwargs.get('limit',False)
     if region==ALL:
         regions=load.meta(product,'run','regions')
@@ -57,7 +58,7 @@ def _predict_job(product,region,force,noisy,limit,cpu_job):
         raise ValueError( SCENES_REQUIRED.format(scenes_path) )
     scenes_args_list=ndj.read(scenes_path)
     kwargs=info.get_predict_kwargs(product,region,limit)
-    args_list=h.update_list(kwargs,scenes_args_list)
+    args_list=dh.update_list(kwargs,scenes_args_list)
     job=DLJob(
         module_name='ulu.predict',
         method_name='predict',
