@@ -3,7 +3,6 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from dl_jobs.job import DLJob
 import dl_jobs.helpers as dh
-from utils.helpers import truthy
 import ulu.info as info
 from config import CONFIRM_DELETE
 
@@ -52,7 +51,7 @@ def delete(product,**kwargs):
         product,
         kwargs.get('cascade',True))
     confirm=kwargs.get('confirm')
-    if truthy(confirm):
+    if dh.truthy(confirm):
         job=DLJob(
             module_name='ulu.product',
             method_name='delete',
@@ -67,7 +66,7 @@ def delete(product,**kwargs):
 def remove_bands(product,**kwargs):
     band_configs=info.get_bands_kwargs_list(product)
     confirm=kwargs.get('confirm')
-    if truthy(confirm):
+    if dh.truthy(confirm):
         job=DLJob(
             module_name='ulu.product',
             method_name='remove_bands',
@@ -83,7 +82,7 @@ def remove_band(product,band_index,**kwargs):
     band_configs=info.get_bands_kwargs_list(product)
     band_index=int(band_index)
     confirm=kwargs.get('confirm')
-    if truthy(confirm):
+    if dh.truthy(confirm):
         job=DLJob(
             module_name='ulu.product',
             method_name='remove_band',
