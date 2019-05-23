@@ -18,15 +18,35 @@ def meta(product,*keys):
     return meta
 
 
-def shape(region=None,path=None,ext='shp'):
+def region_path(region,ext='shp'):
+    rparts=region.split('.')
+    if rparts[-1]=='geojson':
+        ext='geojson'
+        region='.'.join(rparts[:-1])
+    selector='{}/{}/*.{}'.format(
+        REGIONS_DIR,
+        region.lower(),
+        ext)
+    paths=glob(selector)
+
+    if len(paths)>1:
+        raise ValueError("Multiple paths found: {}".format(paths))
+    elif paths:
+        return paths[0]
+    else:
+        raise ValueError("No paths found")
+
+
+def geodataframe(region=None,path=None,ext='shp'):
     if not path:
-        selector='{}/{}/*.{}'.format(
-            REGIONS_DIR,
-            region.lower(),
-            ext)
-        path=glob(selector)[0]
-    return geojson.loads(gpd.read_file(path).geometry.to_json())
+        path=region_path(region=region,ext=ext)
+    return gpd.read_file(path)
         
+
+def shape(region=None,path=None,ext='shp'):
+    return geojson.loads(geodataframe(region,path,ext).geometry.to_json())
+
+
 
 
 

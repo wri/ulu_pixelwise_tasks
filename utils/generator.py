@@ -19,13 +19,17 @@ from config import WINDOW_PADDING
 #
 # Helpers
 #
-def preprocess(im):
+def preprocess(im,bands_last=False):
     """
     - drop alpha
     - rescale
     - clip: 0,1
     """
-    return (im[:-1]/10000.0).clip(0.0,1.0)
+    if bands_last:
+        im=im[:,:,:-1]
+    else:
+        im=im[:-1]
+    return (im/10000.0).clip(0.0,1.0)
 
 
 #
@@ -39,12 +43,13 @@ class ImageSampleGenerator(Sequence):
                 pad=WINDOW_PADDING,
                 look_window=17,
                 prep_image=False,
-                ):
+                bands_last=True):
         if prep_image:
-            image=preprocess(image)
+            image=preprocess(image,bands_last)
         self.image=image
         self.pad=h.get_padding(pad,look_window)
         self.look_window=look_window
+        self.bands_last=bands_last
         self._set_data(image)
     
     # eventually this should all be happening beforehand
@@ -56,8 +61,11 @@ class ImageSampleGenerator(Sequence):
     def _set_data(self,image):
         assert isinstance(image,np.ndarray)
         # can relax conditions later
-        assert len(image.shape)==3
-        assert image.shape[1]==image.shape[2]
+        assert image.ndim==3
+        if self.bands_last:
+            assert image.shape[0]==image.shape[1]
+        else:
+            assert image.shape[1]==image.shape[2]
         self.batch_size=(image.shape[1]-self.pad-self.pad)
         self.size=self.batch_size^2
         # for starters, will make columns into batches/steps
@@ -92,7 +100,7 @@ class ImageSampleGenerator(Sequence):
                 self.image,
                 j,index+self.pad,
                 look_radius,
-                bands_first=True)
+                bands_first=(not self.bands_last))
             samples.append(sample)
         return np.array(samples)
 
