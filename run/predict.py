@@ -12,7 +12,7 @@ import dl_jobs.helpers as dh
 # CONSTANTS
 #
 ALL='all'
-SCENES_REQUIRED='ERROR[ulu.predict]: must save scenes before predicting. ==> run.setup.scenes'
+SCENES_REQUIRED='ERROR[ulu.predict]: {} not found. must run `run.setup.scenes`'
 
 
 #
@@ -27,7 +27,9 @@ MODULES=[
     'mproc',
     'dl_jobs'
 ]
-REQUIREMENTS=[]
+REQUIREMENTS=[
+    # 'tensorflow==1.12'
+]
 GPUS=1
 
 
@@ -53,9 +55,9 @@ def task(product,region=ALL,**kwargs):
 def _predict_job(product,region,force,noisy,limit,cpu_job):
     tiles_path=info.get_tiles_path(product,region,limit)
     scenes_path=info.get_scenes_path(tiles_path,product)
-    results_path, add_timestamp=info.get_prediction_path(tiles_path,product)
     if not os.path.isfile(scenes_path):
         raise ValueError( SCENES_REQUIRED.format(scenes_path) )
+    results_path, add_timestamp=info.get_prediction_path(tiles_path,product)
     scenes_args_list=ndj.read(scenes_path)
     kwargs=info.get_predict_kwargs(product,region,limit)
     args_list=dh.update_list(kwargs,scenes_args_list)

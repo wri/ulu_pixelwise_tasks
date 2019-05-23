@@ -17,6 +17,8 @@ playground.py
 playground.sh
 playground/
 tmp*
+# temp-ignore
+data/datasets 
 
 # Postprocessing
 postprocess/regions/*/

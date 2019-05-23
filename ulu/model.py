@@ -44,9 +44,11 @@ def load(key=None,filename=None,storage_root=None,path=None):
         else:
             path=h.model_path(filename=filename)
     if path:
-        return load_model(
+        mdl=load_model(
             path, 
             custom_objects={'loss':'categorical_crossentropy'})
+        mdl.compile(loss='categorical_crossentropy',optimizer='adam')
+        return mdl
     else:
         raise ValueError(MISSING_MODEL.format(key,filename))
 

@@ -51,17 +51,23 @@ input:
         - alpha
 model: 
     # name: optional_model_short_name
-    filename: 3cat_14ct_green_2017.hd5
-    key: 3cat_14ct_green_2017.hd5
+    # filename: 3cat_14ct_green_2017.hd5
+    # key: 3cat_14ct_green_2017.hd5
+    filename: "bands_last-test2.h5"
+    key: "bands_last-test2.h5"
 run:
     # scenes: sitapur-5:512:8-5:20171101:20180101.ndjson
-    #** local-dev 
+    # #** local-dev 
     regions:
         - sitapur_dev_2
     size: 8
-    #** dl-dev 
+    # #** dl-dev 
     # regions:
     #     - sitapur_dev
+    # size: 512
+    # #** dl-dev 
+    # regions:
+    #     - urban_india_dev.geojson
     # size: 512
     pad: window
     window: 17

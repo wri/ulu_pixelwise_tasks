@@ -47,11 +47,7 @@ def prediction(
         window=WINDOW,
         pad=WINDOW_PADDING,
         prep_image=True):
-    # # FAKE
-    # import time
-    # size=arr.shape[1]-2*h.get_padding(pad,window)
-    # time.sleep(1)
-    # return np.random.rand(size,size,3)
+    arr=arr.swapaxes(0,1).swapaxes(1,2)
     generator=ImageSampleGenerator(
         arr,
         pad=pad,
