@@ -50,15 +50,15 @@ input:
         - alpha   # mask
 model: 
     # name: optional_model_short_name
-    filename: 3cat_14ct_green_2017.hd5
-    key: 3cat_14ct_green_2017.hd5
+    filename: multi_city_2img-fast.h5
+    key: multi_city_2img-fast.h5
 run:
     config_list_name: True
     size: 512
     pad: window
     window: 17
     regions:
-        - kerala
+        - urban_india.geojson
     start_date: '2017-11-01'
     end_date: '2018-01-15'
     nb_scenes: 5

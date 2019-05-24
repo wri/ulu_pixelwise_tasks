@@ -144,37 +144,49 @@ def predict(
         resolution,
         scene_set,
         cloud_mask=False,
-        water_mask=True ):
-    image_id=h.image_id(
-        input_products,
-        product,
-        scene_id,
-        tile_key)
-    im,rinfo=product_image(
-        product=product,
-        scene_id=scene_id,
-        tile_key=tile_key,
-        bands=bands,
-        input_bands=input_bands,
-        window=window,
-        model_key=model_key,
-        model_filename=model_filename,
-        pad=pad,
-        cloud_mask=cloud_mask,
-        water_mask=water_mask )
+        water_mask=True,
+        ERROR=None,
+        ARGS=None,
+        KWARGS=None ):
     meta={
-        'model': model_filename,
-        'scene_id': scene_id,
-        'tile_key': tile_key,
-        'date': date,
-        'region_name': region,
-        'resolution': resolution,
-        'cloud_score': cloud_score,
-        'scene_set': scene_set,
-        'cloud_mask': str(cloud_mask),
-        'water_mask': str(water_mask)
-    }
-    return _upload_scene(product_id,image_id,im,rinfo,meta)
+            'model': model_filename,
+            'scene_id': scene_id,
+            'tile_key': tile_key,
+            'date': date,
+            'region_name': region,
+            'resolution': resolution,
+            'cloud_score': cloud_score,
+            'scene_set': scene_set,
+            'cloud_mask': str(cloud_mask),
+            'water_mask': str(water_mask)
+        }
+    if ERROR:
+        return {
+            'WARNING': 'error in scene',
+            'SCENE_ERROR': ERROR,
+            'SCENE_ARGS': ARGS,
+            'SCENE_KWARGS': KWARGS,
+            'meta': meta
+        }
+    else:
+        image_id=h.image_id(
+            input_products,
+            product,
+            scene_id,
+            tile_key)
+        im,rinfo=product_image(
+            product=product,
+            scene_id=scene_id,
+            tile_key=tile_key,
+            bands=bands,
+            input_bands=input_bands,
+            window=window,
+            model_key=model_key,
+            model_filename=model_filename,
+            pad=pad,
+            cloud_mask=cloud_mask,
+            water_mask=water_mask )
+        return _upload_scene(product_id,image_id,im,rinfo,meta)
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):
@@ -185,12 +197,23 @@ def _upload_scene(product_id,image_id,im,rinfo,meta):
             raster_meta=rinfo,
             extra_properties=meta,
             acquired=meta['date'] )
+    hist=np.unique(im[:,:,1],return_counts=True)
+    cats=hist[0]
+    counts=hist[1]
+    if isinstance(cats,np.ma.core.MaskedArray):
+        cats=cats.data
+    cats=[ int(c) for c  in cats ]
+    counts=[ int(c) for c  in counts ]
     return {
         'ACTION': 'predict',
         'SUCCESS': True,
         'upload_id': upload_id,
         'image_id': image_id,
         'product_id': product_id,
-        'shape': im.shape
+        'shape': im.shape,
+        'hist': {
+            'categories': list(cats),
+            'counts': list(counts)
+        }
     }
 

@@ -28,7 +28,7 @@ MODULES=[
     'dl_jobs'
 ]
 REQUIREMENTS=[
-    # 'tensorflow==1.12'
+    'tensorflow==1.12.0'
 ]
 GPUS=1
 
@@ -40,19 +40,21 @@ def task(product,region=ALL,**kwargs):
     force=dh.truthy(kwargs.get('force',False))
     noisy=dh.truthy(kwargs.get('noisy',True))
     cpu_job=dh.truthy(kwargs.get('cpu',False))
+    gpus=kwargs.get('gpus',GPUS)
+    if gpus: gpus=int(gpus)
     limit=kwargs.get('limit',False)
     if region==ALL:
         regions=load.meta(product,'run','regions')
         jobs=[]
         for region in regions:
-            jobs.append(_predict_job(product,region,force,noisy,limit,cpu_job))
+            jobs.append(_predict_job(product,region,force,noisy,limit,cpu_job,gpus))
         return jobs
     else:
-        return _predict_job(product,region,force,noisy,limit,cpu_job)
+        return _predict_job(product,region,force,noisy,limit,cpu_job,gpus)
 
 
 
-def _predict_job(product,region,force,noisy,limit,cpu_job):
+def _predict_job(product,region,force,noisy,limit,cpu_job,gpus):
     tiles_path=info.get_tiles_path(product,region,limit)
     scenes_path=info.get_scenes_path(tiles_path,product)
     if not os.path.isfile(scenes_path):
@@ -68,8 +70,9 @@ def _predict_job(product,region,force,noisy,limit,cpu_job):
         save_results=results_path,
         results_timestamp=add_timestamp,
         modules=MODULES,
+        requirements=REQUIREMENTS,
         cpu_job=cpu_job,
-        gpus=GPUS,
+        gpus=gpus,
         platform_job=True,
         noisy=noisy )
     return job

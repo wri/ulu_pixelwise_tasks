@@ -4,6 +4,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from glob import glob
 from tensorflow.python.keras.models import load_model
+# import tensorflow.python.keras.initializers.glorot_uniform as glorot_uniform
 from descarteslabs.client.services.storage import Storage
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
@@ -44,9 +45,15 @@ def load(key=None,filename=None,storage_root=None,path=None):
         else:
             path=h.model_path(filename=filename)
     if path:
+        import tensorflow as tf
+        print("LOADING MODEL: ",path)
+        print("TENSORFLOW VERSION: ",tf.__version__)
         mdl=load_model(
             path, 
             custom_objects={'loss':'categorical_crossentropy'})
+        # custom_objects={
+            #     'loss':'categorical_crossentropy',
+            #     'GlorotUniform': glorot_uniform()})
         mdl.compile(loss='categorical_crossentropy',optimizer='adam')
         return mdl
     else:
