@@ -52,7 +52,11 @@ def save_scenes(
     meta['tile_key']=tile_key
     stack=scenes.stack(
         CLOUD_SCORE_BANDS, 
-        ctx, 
+        ctx,
+        flatten=[
+            "properties.date.year",
+            "properties.date.month",
+            "properties.date.day"],
         mask_nodata=True,
         mask_alpha=None,
         bands_axis=-1,
