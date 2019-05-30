@@ -28,13 +28,16 @@ RESAMPLER='bilinear'
 # HELPERS
 #
 def image_data(scene_id,tile_key,input_bands):
-    scene,_=dl.scenes.Scene.from_id(scene_id)
-    tile=dl.scenes.DLTile.from_key(tile_key)
-    return scene.ndarray(
-        bands=input_bands,
-        ctx=tile,
-        resampler=RESAMPLER,
-        raster_info=True)
+    if isinstance(scene_id,list):
+        
+    else:
+        scene,_=dl.scenes.Scene.from_id(scene_id)
+        tile=dl.scenes.DLTile.from_key(tile_key)
+        return scene.ndarray(
+            bands=input_bands,
+            ctx=tile,
+            resampler=RESAMPLER,
+            raster_info=True)
 
 
 #
@@ -87,9 +90,12 @@ def product_image(
         model_key,
         model_filename,
         pad=WINDOW_PADDING,
+        im=None,
+        rinfo=None
         cloud_mask=False,
         water_mask=True ):
-    im,rinfo=image_data(scene_id,tile_key,input_bands)
+    if not im:
+        im,rinfo=image_data(scene_id,tile_key,input_bands)
     rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
@@ -126,13 +132,13 @@ def product_image(
 @as_json
 # @attempt
 @expand_args
-def predict(
+def predict_tile(
         product,
         product_id,
         region,
         input_products,
         tile_key,
-        scene_id,
+        scene_ids,
         bands,
         input_bands,
         window,
@@ -143,6 +149,7 @@ def predict(
         cloud_score,
         resolution,
         scene_set,
+        image=None,
         cloud_mask=False,
         water_mask=True,
         ERROR=None,
@@ -150,7 +157,7 @@ def predict(
         KWARGS=None ):
     meta={
             'model': model_filename,
-            'scene_id': scene_id,
+            'scene_ids': scene_ids,
             'tile_key': tile_key,
             'date': date,
             'region_name': region,
@@ -172,11 +179,12 @@ def predict(
         image_id=h.image_id(
             input_products,
             product,
-            scene_id,
+            scene_ids,
             tile_key)
         im,rinfo=product_image(
             product=product,
-            scene_id=scene_id,
+            scene_id=scene_ids,
+            im=image,
             tile_key=tile_key,
             bands=bands,
             input_bands=input_bands,

@@ -5,12 +5,16 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import json
 from pprint import pprint
 import descarteslabs as dl
+from descarteslabs.scenes import Scene, SceneCollection, DLTile
 import utils.helpers as h
 import utils.load as load
 import dl_jobs.helpers as dh
 #
 # PUBLIC
 #
+"""
+* MULTI FEATURE TILES FOR HANDLED IN NOTEBOOK FOR NOW
+"""
 def get_tile_keys(
         product=None,
         region=None,
@@ -30,7 +34,7 @@ def get_tile_keys(
     else:
         info['existing_file']=False
         shape=load.shape(region)
-        tiles=dl.scenes.DLTile.from_shape(
+        tiles=DLTile.from_shape(
                 shape=shape, 
                 resolution=res, 
                 tilesize=size, 
@@ -52,11 +56,20 @@ def get_tile_keys(
 
 def get_scenes(products,aoi,start_date,end_date):
     if dh.is_str(aoi):
-        aoi=dl.scenes.DLTile.from_key(aoi)
+        aoi=DLTile.from_key(aoi)
     return dl.scenes.search(
         products=products,
         aoi=aoi,
         start_datetime=start_date,
         end_datetime=end_date )
+
+
+def scenes_list(scene_ids):
+    return [s for (s,_) in (Scene.from_id(sid) for sid in scene_ids)]
+
+
+def grouped_scene_collection(grouped_scene_ids):
+    slist=[scenes_list(sids) for sids in grouped_scene_ids]
+    return SceneCollection(slist)
 
 

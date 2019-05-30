@@ -225,6 +225,11 @@ def read_pickle(path):
 #
 # PYTHON
 #
+def sortby(by,*others):
+    return zip(*sorted(list(zip(by,*others))))
+
+
+
 def first(value):
     if isinstance(value,tuple) or isinstance(value,list):
         return value[0]

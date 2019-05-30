@@ -18,7 +18,6 @@ def get_tiles_path(product,region,limit):
     run_cfig=meta['run']
     name=run_cfig.get('tile_set')   
     if name:
-        print('loading tile_set:', name)
         path='{}/{}'.format(TILES_DIR,name)
     else:
         res,size,pad=h.resolution_size_padding(meta=meta)
