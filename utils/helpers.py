@@ -159,10 +159,17 @@ def image_id(prods,pname,sid,tkey=None):
     Args:
         prods=products
         pname=product_name
-        sid=scene_id
+        sid=scene_id or list of scene_ids
         tkey=tile_key
     """
+    if isinstance(sid,list):
+        slen=len(sid)
+        sid=sid[0]
+    else:
+        slen=False
     name=next(re.sub('^{}'.format(p),pname,sid) for p in prods if p in sid)
+    if slen:
+        name='{}+{}'.format(name,slen)
     if tkey:
         name='{}:{}'.format(name,tkey)
     return name
