@@ -2,6 +2,7 @@ from __future__ import print_function
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import numpy as np
+from numba import njit
 from utils.generator import WINDOW_PADDING, preprocess
 import utils.helpers as h
 
@@ -50,7 +51,7 @@ def image_cloud_score(im,bands_first=False,threshold=0.20):
     return im.mean()
 
 
-def map_cloud_scores(
+def slow_map_cloud_scores(
         clouds,
         window,
         scorer=default_cloud_score,
@@ -70,6 +71,38 @@ def map_cloud_scores(
             window_score=scorer(clouds_window)
             score_map[j,i]=window_score
     return score_map
+
+
+def map_cloud_scores(
+        clouds,
+        window,
+        scorer=None,
+        pad=WINDOW_PADDING,
+        noise=None):
+    """
+    * scorer/noise args temporarily kept for compatibility
+    * wraps njit methods to set padding and to pad
+    """
+    pad=h.get_padding(pad,window)
+    scores=_njit_cloud_score(clouds,window)
+    return np.pad(np.array(scores),(pad,pad),'constant',constant_values=-1)
+
+
+@njit(cache=True)
+def _njit_cloud_score(clouds,window):
+    r=int(window/2)
+    assert clouds.ndim==2
+    assert clouds.shape[0]==clouds.shape[1]
+    rows,cols=clouds.shape
+    score_map=np.full(clouds.shape,-1)
+    scores=[]
+    for j in range(r,rows-r):
+        score_cols=[]
+        for i in range(r,cols-r):
+            clouds_window=clouds[j-r:j+r+1,i-r:i+r+1]
+            score_cols.append(clouds_window.mean())
+        scores.append(score_cols)
+    return np.array(scores)  
 
 
 #
