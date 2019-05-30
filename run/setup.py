@@ -24,8 +24,7 @@ TILES_REQUIRED='ERROR[ulu.scenes]: must save tiles before scenes. ==> run.setup.
 MODULES=[
     'config',
     'utils',
-    'ulu',
-    'mproc',
+    'ulu.setup',
     'dl_jobs'
 ]
 
