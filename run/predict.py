@@ -32,7 +32,7 @@ REQUIREMENTS=[
     'numba==0.43.1'
 ]
 GPUS=1
-
+CPUS=2
 
 #
 # TASKS
@@ -77,6 +77,7 @@ def _predict_job(product,region,force,noisy,limit,cpu_job,gpus):
         modules=MODULES,
         requirements=REQUIREMENTS,
         cpu_job=cpu_job,
+        cpus=CPUS,
         gpus=gpus,
         platform_job=True,
         noisy=noisy )
