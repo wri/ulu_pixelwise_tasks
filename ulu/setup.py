@@ -14,33 +14,13 @@ import dl_jobs.helpers as dh
 #
 # CONSTANTS
 #
-RESAMPLER='bilinear'
 CLOUD_SCORE_BANDS="blue green red"
-DATE_PROPERTIES=[
-    "properties.date.year",
-    "properties.date.month",
-    "properties.date.day" ]
+
 
 
 #
 # HELPERS
 #
-def stack_data(scene_ids,tile_key,input_bands,raster_info=True):
-    if isinstance(scene_ids,str):
-        scene_ids=[scene_ids]
-    tile=DLTile.from_key(tile_key)
-    sc=dlabs.grouped_scene_collection(scene_ids)
-    return sc.stack(
-        bands=input_bands,
-        ctx=tile,
-        flatten=DATE_PROPERTIES,
-        mask_nodata=True,
-        mask_alpha=None,
-        bands_axis=-1,
-        resampler=RESAMPLER,
-        raster_info=raster_info)
-
-
 def cloud_scores_grouped_scenes(
         input_products,
         tile_key,
@@ -55,15 +35,15 @@ def cloud_scores_grouped_scenes(
     stack,rinfo=scenes.stack(
         CLOUD_SCORE_BANDS, 
         ctx,
-        flatten=DATE_PROPERTIES,
+        flatten=dlabs.DATE_PROPERTIES,
         mask_nodata=True,
         mask_alpha=None,
         bands_axis=-1,
-        resampler=RESAMPLER,
+        resampler=dlabs.RESAMPLER,
         raster_info=True )
     stack_clouds=masks.stack_cloud_mask(stack)
     scores=stack_clouds.mean(axis=(1,2))
-    grouped_scenes=scenes.groupby(*DATE_PROPERTIES)
+    grouped_scenes=scenes.groupby(*dlabs.DATE_PROPERTIES)
     if return_stack:
         return list(scores), grouped_scenes, stack, rinfo
     else:
@@ -84,19 +64,19 @@ def get_scenes_data(
         end_date,
         return_stack )
     if return_stack:
-        scores, grouped_scenes, stack, rinfo=data
+        cloud_scores, grouped_scenes, stack, rinfo=data
     else:
-        scores, grouped_scenes=data
+        cloud_scores, grouped_scenes=data
     dates,scene_ids_list=dates_scene_ids(grouped_scenes)
-    scores,dates,scene_ids_list=h.sortby(scores,dates,scene_ids_list)
+    cloud_scores,dates,scene_ids_list=h.sortby(cloud_scores,dates,scene_ids_list)
     if nb_scenes:
-        cloud_scores=scores[:nb_scenes]
+        cloud_scores=cloud_scores[:nb_scenes]
         dates=dates[:nb_scenes]
-        scene_ids=scene_ids_list[:nb_scenes]
+        scene_ids_list=scene_ids_list[:nb_scenes]
     if return_stack:
-        return scores, dates, scene_ids_list, stack, rinfo
+        return cloud_scores, dates, scene_ids_list, stack, rinfo
     else:
-        return scores, dates, scene_ids_list
+        return cloud_scores, dates, scene_ids_list
 
 
 def dates_scene_ids(grouped_scenes):

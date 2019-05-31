@@ -12,7 +12,7 @@ import utils.dlabs as dlabs
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
 import ulu.model
-from ulu.setup import get_scenes_data, stack_data
+from ulu.setup import get_scenes_data
 import tensorflow as tf
 from mproc import MPList
 
@@ -36,7 +36,6 @@ def prediction(
         window=WINDOW,
         pad=WINDOW_PADDING,
         prep_image=True):
-    arr=arr.swapaxes(0,1).swapaxes(1,2)
     generator=ImageSampleGenerator(
         arr,
         pad=pad,
@@ -70,20 +69,17 @@ def product_image(
         product,
         tile_key,
         scene_ids,
+        im,
+        rinfo,
         bands,
         input_bands,
         window,
         model_key,
         model_filename,
         pad=WINDOW_PADDING,
-        stack=None,
-        stack_info=None,
         cloud_mask=False,
         water_mask=True ):
-    if stack is None:
-        stack,stack_info=stack_data(scene_ids,tile_key,input_bands)
-    for im_info in stack_info:
-        im_info['bands']=bands
+    rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     """ multiprocess """
@@ -163,28 +159,26 @@ def predict(
         }
     else:
         if not scene_ids:
-            cloud_scores,dates,scene_ids,stack,stack_info=get_scenes_data(
+            cloud_scores, dates, scene_ids=get_scenes_data(
                 input_products,
                 tile_key,
                 start_date,
                 end_date,
-                nb_scenes,
-                return_stack=True )
-        nb_images=len(scene_ids)
-        """ TODO: MPROC? CANT MPROC GPUs <-- NO ~ I THINK """
-        """ ** UP NUMBER OF CPUS IN TASK REQUEST / EXPERIMENT (5*2) ** """
-        """ ** CAREFUL WITH BANDS (get_scenes_data/cloud_scores_grouped_scenes) ** """
-        """ ** ** """
-        for i in range(nb_scenes):
+                nb_scenes)
+        stack, rinfo=dlabs.stack(
+            scene_ids,
+            tile_key,
+            input_bands)
+        for i in range(len(scene_ids)):
             meta['date']=dates[i]
             meta['cloud_score']=cloud_scores[i]
-            meta['scene_ids']=scene_ids[i]
-            img,rinfo=product_image(
+            meta['scene_ids']=str(scene_ids[i])
+            im,rinfo=product_image(
                 product=product,
                 tile_key=tile_key,
                 scene_ids=scene_ids[i],
-                stack=stack[i],
-                stack_info=stack_info[i],
+                im=stack[i],
+                rinfo=rinfo,
                 bands=bands,
                 input_bands=input_bands,
                 window=window,

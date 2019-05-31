@@ -8,14 +8,6 @@ import numpy as np
 from tensorflow.python.keras.utils import Sequence
 import utils.helpers as h
 from config import WINDOW_PADDING
-
-
-
-#
-# CONSTANTS
-#
-
-
 #
 # Helpers
 #

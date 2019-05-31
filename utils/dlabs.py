@@ -10,7 +10,74 @@ import utils.helpers as h
 import utils.load as load
 import dl_jobs.helpers as dh
 #
-# PUBLIC
+# CONSTANTS
+#
+RESAMPLER='bilinear'
+DATE='date'
+DATE_PROPERTIES=[
+    "properties.date.year",
+    "properties.date.month",
+    "properties.date.day" ]
+
+
+#
+# HELPERS
+#
+def get_scenes(products,aoi,start_date,end_date):
+    if dh.is_str(aoi):
+        aoi=DLTile.from_key(aoi)
+    return dl.scenes.search(
+        products=products,
+        aoi=aoi,
+        start_datetime=start_date,
+        end_datetime=end_date )
+
+
+def scenes_list(scene_ids):
+    return [s for (s,_) in (Scene.from_id(sid) for sid in scene_ids)]
+
+
+def scene_collection(scene_ids,groupby=None):
+    if isinstance(scene_ids[0],list):
+        scene_ids=h.flatten_list(scene_ids)
+    sc=SceneCollection(scenes_list(scene_ids))
+    if groupby==DATE:
+        groupby=DATE_PROPERTIES
+    if groupby:
+        sc=sc.groupby(*groupby)
+    return sc
+
+
+def stack(
+        scene_ids,
+        tile,
+        input_bands,
+        flatten=DATE_PROPERTIES,
+        raster_info=True,
+        rinfo_list=False):
+    if dh.is_str(scene_ids):
+        scene_ids=[scene_ids]
+    if dh.is_str(tile):
+        tile=DLTile.from_key(tile)
+    sc=scene_collection(scene_ids)
+    stack_data=sc.stack(
+        bands=input_bands,
+        ctx=tile,
+        flatten=flatten,
+        mask_nodata=True,
+        mask_alpha=None,
+        bands_axis=-1,
+        resampler=RESAMPLER,
+        raster_info=raster_info)
+    if (not raster_info) or rinfo_list:
+        return stack_data
+    else:
+        stk,rinfo=stack_data
+        return stk, rinfo[0]
+
+
+#
+# MAIN
 #
 """
 * MULTI FEATURE TILES FOR HANDLED IN NOTEBOOK FOR NOW
@@ -52,24 +119,5 @@ def get_tile_keys(
         return tile_keys, info
     else:
         return tile_keys
-
-
-def get_scenes(products,aoi,start_date,end_date):
-    if dh.is_str(aoi):
-        aoi=DLTile.from_key(aoi)
-    return dl.scenes.search(
-        products=products,
-        aoi=aoi,
-        start_datetime=start_date,
-        end_datetime=end_date )
-
-
-def scenes_list(scene_ids):
-    return [s for (s,_) in (Scene.from_id(sid) for sid in scene_ids)]
-
-
-def grouped_scene_collection(grouped_scene_ids):
-    slist=[scenes_list(sids) for sids in grouped_scene_ids]
-    return SceneCollection(slist)
 
 

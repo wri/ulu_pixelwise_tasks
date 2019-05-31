@@ -13,9 +13,9 @@ def default_cloud_score(clouds):
     return clouds.mean()
 
 
-def cloud_score(im,window,pad='window',noise=None):
-    image=preprocess(im)
-    mask=cloud_mask(image,bands_first=True)
+def cloud_score(im,window,pad='window',noise=None,bands_first=False):
+    im=preprocess(im,bands_last=(not bands_first))
+    mask=cloud_mask(im,bands_first=bands_first)
     scores=map_cloud_scores(mask,window,pad=pad,noise=noise)
     return mask, scores
 
@@ -107,16 +107,12 @@ def _njit_cloud_score(clouds,window):
 # water
 #
 def calc_water_mask(im,idx_green=1,idx_nir=3,threshold=0.15,bands_first=False):
-    if bands_first:
-        assert im.shape[0]==6
-    else:
-        assert im.shape[2]==6
     ndwi=h.spectral_index(im,idx_green,idx_nir,bands_first=bands_first)
     return ndwi > threshold
 
 
-def water_mask(arr,mask=None):
-    water_mask=calc_water_mask(arr[:-1],bands_first=True)
+def water_mask(arr,mask=None,bands_first=False):
+    water_mask=calc_water_mask(arr,bands_first=bands_first)
     if mask is not None:
         crp=int((water_mask.shape[1]-mask.shape[1])/2)
         water_mask=h.crop(water_mask,crp)
@@ -128,8 +124,12 @@ def water_mask(arr,mask=None):
 #
 # OTHER
 #
-def blank_mask(arr,crp=None):
-    blank_mask=np.invert(arr[-1].astype(bool))
+def blank_mask(arr,crp=None,bands_first=False):
+    if bands_first:
+        arr=arr[-1]
+    else:
+        arr=arr[:,:,-1]
+    blank_mask=np.invert(arr.astype(bool))
     if crp:
         blank_mask=h.crop(blank_mask,crp)
     return blank_mask

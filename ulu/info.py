@@ -67,26 +67,6 @@ def get_prediction_path(scenes_path,product):
 # GET ARGS/KWARGS
 #
 def get_product_kwargs(product,date_index=None,region_index=None):
-    """ product.create
-    Catalog.product kwargs: 
-    + product_id (str) – (Required) A unique name for this product. In the created product a namespace consisting of your user id (e.g. “ae60fc891312ggadc94ade8062213b0063335a3c:”) or your organization id (e.g., “yourcompany:”) will be prefixed to this, if it doesn’t already have one, in order to make the id globally unique.
-    + title (str) – (Required) Official product title.
-    + description (str) – (Required) Information about the product, why it exists, and what it provides.
-    + add_namespace (bool) – Add your user namespace to the product_id. Deprecated
-    + read (list(str)) – A list of groups, or user hashes to give read access to.
-    - spectral_bands (int) – Number of spectral bands the product has.
-    - native_bands (list(str)) – A list of the names of the native bands of this product (most applicable to satellite sensors).
-    + start_datetime (str) – ISO8601 compliant date string, indicating start of product data.
-    + end_datetime (str) – ISO8601 compliant date string, indicating end of product data.
-    * notes (str) – Any notes to relay about the product.
-    - orbit (str) – Type of orbit (satellite only).
-    - processing_level (str) – Way in which raw data has been processed if any.
-    + resolution (str) – Pixel density of the data, provide units.
-    - revisit (str) – How often an AOI can expect updated data.
-    - sensor (str) – Name of the sensor used.
-    - swath (str) – How large an area the sensor captures at a given time.
-    - writers (list(str)) – A list of groups, or user hashes to give read access to.
-    """
     meta=load.meta(product)
     run_cfig=meta['run']
     product_cfig=meta['product']
