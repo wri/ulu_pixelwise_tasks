@@ -56,19 +56,16 @@ model:
     filename: "multi_city_2img-fast.h5"
     key: "multi_city_2img-fast.h5"
 run:
-    # scenes: sitapur-5:512:8-5:20171101:20180101.ndjson
+    tile_set: urban_india-5:512:8-DEV5.p
+    scenes: urban_india-5:512:8-DEV5-5:20171101:20180115.ndjson
     # # # #** local-dev 
     # regions:
     #     - sitapur_dev_2
-    size: 8
+    # size: 8
     # # #** dl-dev 
     regions:
-        - sitapur
+        - urban_india-dev5
     size: 512
-    # #** dl-dev 
-    # regions:
-    #     - urban_india_dev.geojson
-    # size: 512
     pad: window
     window: 17
     start_date: '2017-11-01'

@@ -91,10 +91,8 @@ def map_cloud_scores(
 @njit(cache=True)
 def _njit_cloud_score(clouds,window):
     r=int(window/2)
-    assert clouds.ndim==2
-    assert clouds.shape[0]==clouds.shape[1]
     rows,cols=clouds.shape
-    score_map=np.full(clouds.shape,-1)
+    score_map=np.full((rows,cols),-1)
     scores=[]
     for j in range(r,rows-r):
         score_cols=[]

@@ -12,8 +12,8 @@ import dl_jobs.helpers as dh
 # CONSTANTS
 #
 ALL='all'
-SCENES_REQUIRED='ERROR[ulu.predict]: {} not found. must run `run.setup.scenes`'
-
+WARN_NO_SCENES='WARNING:\n\t- scene_set not found({})\n\t- running from tile_set'
+CPU_JOB=True
 
 #
 # DL FUNCTION ARGS
@@ -28,7 +28,8 @@ MODULES=[
     'dl_jobs'
 ]
 REQUIREMENTS=[
-    'tensorflow==1.12.0'
+    'tensorflow==1.12.0',
+    'numba==0.43.1'
 ]
 GPUS=1
 
@@ -39,7 +40,7 @@ GPUS=1
 def task(product,region=ALL,**kwargs):
     force=dh.truthy(kwargs.get('force',False))
     noisy=dh.truthy(kwargs.get('noisy',True))
-    cpu_job=dh.truthy(kwargs.get('cpu',False))
+    cpu_job=dh.truthy(kwargs.get('cpu',CPU_JOB))
     gpus=kwargs.get('gpus',GPUS)
     if gpus: gpus=int(gpus)
     limit=kwargs.get('limit',False)
@@ -57,12 +58,16 @@ def task(product,region=ALL,**kwargs):
 def _predict_job(product,region,force,noisy,limit,cpu_job,gpus):
     tiles_path=info.get_tiles_path(product,region,limit)
     scenes_path=info.get_scenes_path(tiles_path,product)
-    if not os.path.isfile(scenes_path):
-        raise ValueError( SCENES_REQUIRED.format(scenes_path) )
+    if os.path.isfile(scenes_path):
+        args_list=ndj.read(scenes_path)
+    else:
+        print(WARN_NO_SCENES.format(scenes_path))
+        scenes_kwargs=info.get_scenes_kwargs(product,region,limit)
+        tile_keys=h.read_pickle(tiles_path)
+        args_list=dh.update_list(scenes_kwargs,tile_keys,'tile_key')
     results_path, add_timestamp=info.get_prediction_path(tiles_path,product)
-    scenes_args_list=ndj.read(scenes_path)
     kwargs=info.get_predict_kwargs(product,region,limit)
-    args_list=dh.update_list(kwargs,scenes_args_list)
+    args_list=dh.update_list(kwargs,args_list)
     job=DLJob(
         module_name='ulu.predict',
         method_name='predict',

@@ -212,6 +212,9 @@ def get_predict_kwargs(product,region,limit):
             'input_bands': input_cfig['bands'],
             'resolution': res,
             'pad': pad,
+            'nb_scenes': run_cfig['nb_scenes'],
+            'start_date': run_cfig['start_date'],
+            'end_date': run_cfig['end_date'],
             'scene_set': scene_set
         }
 

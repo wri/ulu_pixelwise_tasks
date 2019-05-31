@@ -167,6 +167,7 @@ def image_id(prods,pname,sid,tkey=None):
         sid=sid[0]
     else:
         slen=False
+    ps=[p for p in prods if p in sid]
     name=next(re.sub('^{}'.format(p),pname,sid) for p in prods if p in sid)
     if slen:
         name='{}+{}'.format(name,slen)

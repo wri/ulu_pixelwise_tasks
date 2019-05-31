@@ -8,9 +8,11 @@ from descarteslabs.client.services.catalog import Catalog
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.masks as masks
+import utils.dlabs as dlabs
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
 import ulu.model
+from ulu.setup import get_scenes_data, stack_data
 import tensorflow as tf
 from mproc import MPList
 
@@ -20,24 +22,8 @@ from pprint import pprint
 #   CONSTANTS
 #
 DTYPE='float32'
-RESAMPLER='bilinear'
 
 
-
-#
-# HELPERS
-#
-def image_data(scene_id,tile_key,input_bands):
-    if isinstance(scene_id,list):
-        
-    else:
-        scene,_=dl.scenes.Scene.from_id(scene_id)
-        tile=dl.scenes.DLTile.from_key(tile_key)
-        return scene.ndarray(
-            bands=input_bands,
-            ctx=tile,
-            resampler=RESAMPLER,
-            raster_info=True)
 
 
 #
@@ -82,21 +68,22 @@ def category_prediction(preds,mask):
 #
 def product_image(
         product,
-        scene_id,
         tile_key,
+        scene_ids,
         bands,
         input_bands,
         window,
         model_key,
         model_filename,
         pad=WINDOW_PADDING,
-        im=None,
-        rinfo=None
+        stack=None,
+        stack_info=None,
         cloud_mask=False,
         water_mask=True ):
-    if not im:
-        im,rinfo=image_data(scene_id,tile_key,input_bands)
-    rinfo['bands']=bands
+    if stack is None:
+        stack,stack_info=stack_data(scene_ids,tile_key,input_bands)
+    for im_info in stack_info:
+        im_info['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     """ multiprocess """
@@ -132,24 +119,26 @@ def product_image(
 @as_json
 # @attempt
 @expand_args
-def predict_tile(
+def predict(
         product,
         product_id,
         region,
         input_products,
         tile_key,
-        scene_ids,
+        nb_scenes,
+        start_date,
+        end_date,
         bands,
         input_bands,
         window,
         model_key,
         model_filename,
         pad,
-        date,
-        cloud_score,
         resolution,
         scene_set,
-        image=None,
+        scene_ids=None,
+        cloud_scores=None,
+        dates=None,
         cloud_mask=False,
         water_mask=True,
         ERROR=None,
@@ -157,12 +146,9 @@ def predict_tile(
         KWARGS=None ):
     meta={
             'model': model_filename,
-            'scene_ids': scene_ids,
             'tile_key': tile_key,
-            'date': date,
             'region_name': region,
             'resolution': resolution,
-            'cloud_score': cloud_score,
             'scene_set': scene_set,
             'cloud_mask': str(cloud_mask),
             'water_mask': str(water_mask)
@@ -176,25 +162,43 @@ def predict_tile(
             'meta': meta
         }
     else:
-        image_id=h.image_id(
-            input_products,
-            product,
-            scene_ids,
-            tile_key)
-        im,rinfo=product_image(
-            product=product,
-            scene_id=scene_ids,
-            im=image,
-            tile_key=tile_key,
-            bands=bands,
-            input_bands=input_bands,
-            window=window,
-            model_key=model_key,
-            model_filename=model_filename,
-            pad=pad,
-            cloud_mask=cloud_mask,
-            water_mask=water_mask )
-        return _upload_scene(product_id,image_id,im,rinfo,meta)
+        if not scene_ids:
+            cloud_scores,dates,scene_ids,stack,stack_info=get_scenes_data(
+                input_products,
+                tile_key,
+                start_date,
+                end_date,
+                nb_scenes,
+                return_stack=True )
+        nb_images=len(scene_ids)
+        """ TODO: MPROC? CANT MPROC GPUs <-- NO ~ I THINK """
+        """ ** UP NUMBER OF CPUS IN TASK REQUEST / EXPERIMENT (5*2) ** """
+        """ ** CAREFUL WITH BANDS (get_scenes_data/cloud_scores_grouped_scenes) ** """
+        """ ** ** """
+        for i in range(nb_scenes):
+            meta['date']=dates[i]
+            meta['cloud_score']=cloud_scores[i]
+            meta['scene_ids']=scene_ids[i]
+            img,rinfo=product_image(
+                product=product,
+                tile_key=tile_key,
+                scene_ids=scene_ids[i],
+                stack=stack[i],
+                stack_info=stack_info[i],
+                bands=bands,
+                input_bands=input_bands,
+                window=window,
+                model_key=model_key,
+                model_filename=model_filename,
+                pad=pad,
+                cloud_mask=cloud_mask,
+                water_mask=water_mask )
+            image_id=h.image_id(
+                input_products,
+                product,
+                scene_ids[i],
+                tile_key)
+            return _upload_scene(product_id,image_id,im,rinfo,meta)
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):
