@@ -50,22 +50,14 @@ input:
         - swir2
         - alpha
 model: 
-    # name: optional_model_short_name
-    # filename: 3cat_14ct_green_2017.hd5
-    # key: 3cat_14ct_green_2017.hd5
-    filename: "multi_city_2img-fast.h5"
-    key: "multi_city_2img-fast.h5"
+    filename: "3cat_14ct_green_2017_2-img-bl_weights_slow.hdf5.index"
+    key: "3cat_14ct_green_2017_2-img-bl_weights_slow.hdf5.index"
 run:
-    tile_set: urban_india-5:512:8-DEV5.p
-    scenes: urban_india-5:512:8-DEV5-5:20171101:20180115.ndjson
-    # # # #** local-dev 
-    # regions:
-    #     - sitapur_dev_2
-    # size: 8
-    # # #** dl-dev 
+    tile_set: urban_india-5:512:8-DEV2000.p
+    scenes: urban_india-5:512:8-DEV2000-5:20171101:20180115.ndjson
     regions:
-        - urban_india-dev5
-    size: 512
+        - urban_india-dev2000
+    size: 1024
     pad: window
     window: 17
     start_date: '2017-11-01'

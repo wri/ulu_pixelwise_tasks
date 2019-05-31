@@ -12,7 +12,7 @@ import utils.dlabs as dlabs
 from utils.generator import ImageSampleGenerator
 from config import WINDOW,WINDOW_PADDING,RESAMPLER
 import ulu.model
-from ulu.setup import get_scenes_data
+from ulu.scenes import get_scenes_data
 import tensorflow as tf
 from mproc import MPList
 

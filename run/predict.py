@@ -38,6 +38,7 @@ CPUS=2
 # TASKS
 #
 def task(product,region=ALL,**kwargs):
+    log=dh.truthy(kwargs.get('log',True))
     force=dh.truthy(kwargs.get('force',False))
     noisy=dh.truthy(kwargs.get('noisy',True))
     cpu_job=dh.truthy(kwargs.get('cpu',CPU_JOB))
@@ -48,14 +49,14 @@ def task(product,region=ALL,**kwargs):
         regions=load.meta(product,'run','regions')
         jobs=[]
         for region in regions:
-            jobs.append(_predict_job(product,region,force,noisy,limit,cpu_job,gpus))
+            jobs.append(_predict_job(log,product,region,force,noisy,limit,cpu_job,gpus))
         return jobs
     else:
-        return _predict_job(product,region,force,noisy,limit,cpu_job,gpus)
+        return _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus)
 
 
 
-def _predict_job(product,region,force,noisy,limit,cpu_job,gpus):
+def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
     tiles_path=info.get_tiles_path(product,region,limit)
     scenes_path=info.get_scenes_path(tiles_path,product)
     if os.path.isfile(scenes_path):
@@ -79,6 +80,7 @@ def _predict_job(product,region,force,noisy,limit,cpu_job,gpus):
         cpu_job=cpu_job,
         cpus=CPUS,
         gpus=gpus,
+        log=log,
         platform_job=True,
         noisy=noisy )
     return job
