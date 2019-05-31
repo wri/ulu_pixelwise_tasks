@@ -53,8 +53,8 @@ model:
     filename: "3cat_14ct_green_2017_2-img-bl_weights_slow.hdf5.index"
     key: "3cat_14ct_green_2017_2-img-bl_weights_slow.hdf5.index"
 run:
-    tile_set: urban_india-5:1024:8-DEV2000.p
-    # scenes: urban_india-5:512:8-DEV2000-5:20171101:20180115.ndjson
+    tile_set: urban_india-5:1024:8-DEV660.p
+    # scenes: urban_india-5:512:8-DEV660-5:20171101:20180115.ndjson
     regions:
         - urban_india.geojson
     size: 1024
