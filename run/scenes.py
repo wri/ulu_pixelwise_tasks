@@ -32,7 +32,7 @@ MODULES=[
 #
 # PUBLIC
 #
-def scenes(product,region=ALL,**kwargs):
+def task(product,region=ALL,**kwargs):
     """ save scenes """
     force=dh.truthy(kwargs.get('force',False))
     noisy=dh.truthy(kwargs.get('noisy',True))

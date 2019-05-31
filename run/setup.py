@@ -31,7 +31,7 @@ MODULES=[
 #
 # PUBLIC
 #
-def product(*args,**kwargs):
+def task(*args,**kwargs):
     """ 
     1. Create DLProduct
     2. Add Bands to DLProduct
@@ -44,21 +44,30 @@ def product(*args,**kwargs):
 
 
 def tiles(product,region=ALL,**kwargs):
-    """ save tiles """
-    force=dh.truthy(kwargs.get('force',False))
-    noisy=dh.truthy(kwargs.get('noisy',True))
-    limit=kwargs.get('limit',False)
-    if limit: 
-        limit=int(limit)
-    if region==ALL:
-        regions=load.meta(product,'run','regions')
-        jobs=[]
-        for region in regions:
-            jobs.append(_tiles_job(product,region,force,noisy,limit))
-        return jobs
+    as_dl_job=dh.truthy(kwargs.get('as_dl_job',False))
+    if as_dl_job:
+        """ save tiles """
+        force=dh.truthy(kwargs.get('force',False))
+        noisy=dh.truthy(kwargs.get('noisy',True))
+        limit=kwargs.get('limit',False)
+        if limit: 
+            limit=int(limit)
+        if region==ALL:
+            regions=load.meta(product,'run','regions')
+            jobs=[]
+            for region in regions:
+                jobs.append(_tiles_job(product,region,force,noisy,limit))
+            return jobs
+        else:
+            return _tiles_job(product,region,force,noisy,limit)
     else:
-        return _tiles_job(product,region,force,noisy,limit)
-
+        warning=(
+            'WARNING: '
+            '\n\turban-india geojson tiles processed in notebook'
+            '\n\tuse `as_dl_job=True` to run on other regions'
+            '\n'
+        )
+        print(warning)
 
 #
 # INTERNAL

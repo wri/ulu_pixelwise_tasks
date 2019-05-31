@@ -28,13 +28,12 @@ def region_path(region,ext='shp'):
         region.lower(),
         ext)
     paths=glob(selector)
-
     if len(paths)>1:
         raise ValueError("Multiple paths found: {}".format(paths))
     elif paths:
         return paths[0]
     else:
-        raise ValueError("No paths found")
+        raise ValueError("Region ({}) does not exist".format(region))
 
 
 def geodataframe(region=None,path=None,ext='shp'):
