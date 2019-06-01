@@ -33,6 +33,7 @@ REQUIREMENTS=[
 ]
 GPUS=1
 CPUS=2
+TASK_KWARGS={ 'memory': '2Gi' }
 
 #
 # TASKS
@@ -77,6 +78,7 @@ def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
         results_timestamp=add_timestamp,
         modules=MODULES,
         requirements=REQUIREMENTS,
+        task_kwargs=TASK_KWARGS,
         cpu_job=cpu_job,
         cpus=CPUS,
         gpus=gpus,

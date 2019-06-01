@@ -10,7 +10,10 @@ import dl_jobs.helpers as dh
 # CREATION TASKS
 #
 def upload(product,**kwargs):
-    job_kwargs=info.get_model_kwargs(product)
+    model=kwargs.get('model')
+    key=kwargs.get('key')
+    filename=kwargs.get('filename')
+    job_kwargs=info.get_model_kwargs(product,model,key,filename)
     job=DLJob(
         module_name='ulu.model',
         method_name='upload',

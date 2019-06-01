@@ -2,6 +2,7 @@ from __future__ import print_function
 import os
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+import re
 from copy import deepcopy
 import mproc
 from dl_jobs.utils import Timer
@@ -58,6 +59,8 @@ def get_prediction_path(scenes_path,product):
     else:
         path=scenes_path
         add_timestamp=True
+    path=os.path.basename(path)
+    path=re.sub(r'.p$','',path)
     return path, add_timestamp
 
 
@@ -143,9 +146,16 @@ def get_bands_kwargs_list(product):
     return bands_kwargs_list
 
 
-def get_model_kwargs(product):
+def get_model_kwargs(product,model=None,key=None,filename=None):
     """ model.upload/delete """
     model_cfig=load.meta(product,'model')
+    if model:
+        model_cfig['key']=model
+        model_cfig['filename']=model
+    if key:
+        model_cfig['key']=key
+    if filename:
+        model_cfig['filename']=filename
     model_cfig['key']=h.model_key(model_cfig['key'],model_cfig.get('dls_root'))
     return model_cfig
 
