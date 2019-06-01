@@ -88,7 +88,7 @@ def map_cloud_scores(
     return np.pad(np.array(scores),(pad,pad),'constant',constant_values=-1)
 
 
-@njit(cache=True)
+@njit(cache=False)
 def _njit_cloud_score(clouds,window):
     r=int(window/2)
     rows,cols=clouds.shape

@@ -38,7 +38,7 @@ CPUS=2
 # TASKS
 #
 def task(product,region=ALL,**kwargs):
-    log=dh.truthy(kwargs.get('log',True))
+    log=kwargs.get('log',True)
     force=dh.truthy(kwargs.get('force',False))
     noisy=dh.truthy(kwargs.get('noisy',True))
     cpu_job=dh.truthy(kwargs.get('cpu',CPU_JOB))

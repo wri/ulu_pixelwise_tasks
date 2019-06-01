@@ -26,7 +26,9 @@ MODULES=[
     'ulu.scenes',
     'dl_jobs'
 ]
-
+REQUIREMENTS=[
+    'numba==0.43.1'
+]
 
 
 #
@@ -73,6 +75,7 @@ def _scenes_job(product,region,force,noisy,limit):
             args_list=args_list,
             save_results=path,
             modules=MODULES,
+            requirements=REQUIREMENTS,
             cpu_job=True,
             gpus=None,
             platform_job=True,
