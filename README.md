@@ -24,6 +24,16 @@ REQUIRED (non-pypi) MODULES:
 * https://github.com/wri/dl_jobs
 * https://github.com/brookisme/mproc
 
+OTHER (version not included/may not be complete):
+
+* rasterio
+* requests
+* geopandas
+* geojson
+* pandas
+* numpy
+* numba
+
 ---
 
 [YAML Config](https://github.com/wri/ulu_pixelwise_tasks/tree/master/products) files are used to configure the product and control the arguments passed to the `dl_jobs`.
