@@ -33,7 +33,8 @@ REQUIREMENTS=[
 ]
 GPUS=1
 CPUS=2
-TASK_KWARGS={ 'memory': '2Gi' }
+TASK_KWARGS={ 'memory': '10Gi' }
+
 
 #
 # TASKS
@@ -74,7 +75,7 @@ def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
         module_name='ulu.predict',
         method_name='predict',
         args_list=args_list,
-        save_results=results_path,
+        save_results=info.path_root(results_path),
         results_timestamp=add_timestamp,
         modules=MODULES,
         requirements=REQUIREMENTS,

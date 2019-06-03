@@ -59,9 +59,14 @@ def get_prediction_path(scenes_path,product):
     else:
         path=scenes_path
         add_timestamp=True
+    return path, add_timestamp
+
+
+def path_root(path):
     path=os.path.basename(path)
     path=re.sub(r'.p$','',path)
-    return path, add_timestamp
+    path=re.sub(r'.ndjson$','',path)
+    return path
 
 
 
