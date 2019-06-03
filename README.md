@@ -2,7 +2,7 @@
 
 _Urban Land Use Predictions with DLTasks_
 
-Generates predictions for [wri/UrbanLandUse](https://github.com/wri/UrbanLandUse) using DescartesLabs' Task API.
+Generates predictions for [wri/UrbanLandUse](https://github.com/wri/UrbanLandUse) using DescartesLabs' [Tasks API](https://docs.descarteslabs.com/descarteslabs/client/services/tasks/readme.html).
 
 ___
 
@@ -17,7 +17,7 @@ pip install -e .
 
 ENV:
 
-* using py36 with TF-1.12
+* py36 with TF-1.12
 
 REQUIRED (non-pypi) MODULES:
 
@@ -26,7 +26,7 @@ REQUIRED (non-pypi) MODULES:
 
 ---
 
-[YAML Config files](https://github.com/wri/ulu_pixelwise_tasks/tree/master/products), along with DLJobs are used to generate predictions. 
+[YAML Config](https://github.com/wri/ulu_pixelwise_tasks/tree/master/products) files are used to configure the product and control the arguments passed to the `dl_jobs`.
 
 Here is an example walk through for [test_prod](https://github.com/wri/ulu_pixelwise_tasks/blob/master/products/test_prod.yaml).  Note I've included `--dev f` so that the jobs run on the DLPlatform.  This is required because my `dl_jobs.config.yaml` file has `dev=True`.
 
