@@ -38,7 +38,7 @@ OTHER (version not included/may not be complete):
 
 [YAML Config](https://github.com/wri/ulu_pixelwise_tasks/tree/master/products) files are used to configure the product and control the arguments passed to the `dl_jobs`.
 
-Here is an example walk through for [test_prod](https://github.com/wri/ulu_pixelwise_tasks/blob/master/products/test_prod.yaml).  Note I've included `--dev f` so that the jobs run on the DLPlatform.  This is required because my `dl_jobs.config.yaml` file has `dev=True`.
+Here is an example walk through for [test_prod](https://github.com/wri/ulu_pixelwise_tasks/blob/master/products/test_prod.yaml).  Note I've included `--dev f` so that the jobs run on the DLPlatform.  This is required because my `dl_jobs.config.yaml` file has `is_dev: True`.
 
 1. You can create the product, add bands to the product and upload the model by running this:
 
