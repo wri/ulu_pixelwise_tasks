@@ -63,7 +63,7 @@ $ dl_jobs run predict test_prod --dev f
 To pre-compute the best S2-scenes run:
 
 ```bash
-dl_jobs run setup.scenes test_prod --dev f
+$ dl_jobs run setup.scenes test_prod --dev f
 ```
 
 and then:
