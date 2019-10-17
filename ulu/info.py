@@ -188,7 +188,14 @@ def get_predict_kwargs(product,region,limit):
     bands_cfig=meta['bands']
     product_id=product_cfig.get(
         'product_id',
-        h.product_id(product_cfig['name'],product_cfig.get('owner')))
+        h.product_id(
+            product_cfig['name'],
+            product_cfig.get('owner')))
+    mode_product_id=product_cfig.get(
+        'mode_product_id',
+        h.product_id(
+            product_cfig.get('mode_product_name'),
+            product_cfig.get('owner')))
     product_bands=[ b['name'] for b in bands_cfig ]
     res,_,pad=h.resolution_size_padding(meta=meta)
     tiles_path=get_tiles_path(product,region,limit)
@@ -197,6 +204,7 @@ def get_predict_kwargs(product,region,limit):
     return {
             'product': product_cfig['name'],
             'product_id': product_id,
+            'mode_product_id': mode_product_id,
             'bands': [ b['name'] for b in bands_cfig ],
             'model_filename': model_cfig.get('filename'),
             'model_key': model_cfig.get('key'),

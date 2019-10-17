@@ -52,7 +52,7 @@ $ dl_jobs run setup test_prod
 $ dl_jobs run setup.tiles test_prod --dev f
 ```
 
-However for complicated polygons we are still managing tile creation by hand.  See this [notebook](https://github.com/wri/ulu_pixelwise_tasks/blob/master/nb_archive/UrbanIndiaTiles.ipynb) as an example.
+However for complicated polygons we are still managing tile creation by hand.  See this [notebook](https://nbviewer.jupyter.org/github/wri/ulu_pixelwise_tasks/blob/master/nb_archive/UrbanIndiaTiles.ipynb) as an example.
 
 3. Before prediction you have to select the S2-scenes of interest.  This can happen on the fly or be precomputed before hand. To compute the S2-scenes on the fly simply run:
 
@@ -63,7 +63,7 @@ $ dl_jobs run predict test_prod --dev f
 To pre-compute the best S2-scenes run:
 
 ```bash
-$ dl_jobs run setup.scenes test_prod --dev f
+$ dl_jobs run scenes test_prod --dev f
 ```
 
 and then:

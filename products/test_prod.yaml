@@ -1,5 +1,6 @@
 product:
     owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
+    mode_product_name: test_prod_mode
     name: test_prod
     description: description of test product
     resolution: 5m
@@ -50,16 +51,19 @@ input:
         - swir2
         - alpha
 model: 
-    filename: "3cat_14ct_green_2017_2-img-bl_slow.hd5"
-    key: "3cat_14ct_green_2017_2-img-bl_slow.hd5"
+    filename: 3cat_all_exclusions.hd5
+    key: 3cat_all_exclusions.hd5
+    # filename: multi_city_2img-fast.h5
+    # key: multi_city_2img-fast.h5
 run:
-    # tile_set: urban_india-5:512:8-DEV2000.p
-    # # scenes: urban_india-5:512:8-DEV2000-5:20171101:20180115.ndjson
-    tile_set: urban_india-5:1024:8-DEV660.p
-    scene_set: urban_india-5:1024:8-DEV660-5:20171101:20180115_Jun.03.2019.06:12:49.ndjson
+    # tile_set: sitapur_dev_2-5:32:8.p
+    # tile_set: urban_india-5:512:8-b4.p
+    # tile_set: urban_india-5:1024:8-DEV660.p
+    tile_set: urban_india-5:512:8-b0.p
+    # scene_set: urban_india-5:1024:8-DEV660-5:20171101:20180115_Jun.03.2019.06:12:49.ndjson
     regions:
-        - urban_india.geojson
-    size: 1024
+        - urban_india
+    size: 32
     pad: window
     window: 17
     start_date: '2017-11-01'

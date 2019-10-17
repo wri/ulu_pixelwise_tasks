@@ -5,7 +5,6 @@ import numpy as np
 from numba import njit
 from utils.generator import WINDOW_PADDING, preprocess
 import utils.helpers as h
-
 #
 # CLOUDS
 #
@@ -59,6 +58,7 @@ def slow_map_cloud_scores(
         noise=None):
     pad=h.get_padding(pad,window)
     r=int(window/2)
+    print(clouds.shape)
     assert clouds.ndim==2
     assert clouds.shape[0]==clouds.shape[1]
     rows,cols=clouds.shape

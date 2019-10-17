@@ -56,12 +56,28 @@ def spectral_index(im,b1,b2,eps=EPS,bands_first=False,is_stack=False):
     return np.divide(b1-b2,b1+b2+eps).clip(-1.0,1.0)
 
 
+def mode(a, axis=0):
+    """ https://stackoverflow.com/a/12399155/607528
+    """
+    scores = np.unique(np.ravel(a))
+    testshape = list(a.shape)
+    testshape[axis] = 1
+    oldmostfreq = np.zeros(testshape)
+    oldcounts = np.zeros(testshape)
+
+    for score in scores:
+        template = (a == score)
+        counts = np.expand_dims(np.sum(template, axis),axis)
+        mostfrequent = np.where(counts > oldcounts, score, oldmostfreq)
+        oldcounts = np.maximum(counts, oldcounts)
+        oldmostfreq = mostfrequent
+
+    return mostfrequent, oldcounts
+
 
 #
 # PATHS/NAMES/VALUES
 #
-
-
 def tiles_path(
         region,
         res,
@@ -131,10 +147,11 @@ def config_list_path(config_list_name,product=None,size=None,window=None):
 
 
 def product_id(name,owner):
-    if (":" in name) or (not owner):
-        return name
-    else:
-        return '{}:{}'.format(owner,name)
+    if name:
+        if (":" in name) or (not owner):
+            return name
+        else:
+            return '{}:{}'.format(owner,name)
 
 
 def product_title(name,title):
@@ -287,5 +304,40 @@ def flatten_list(a):
 def strip_to_int(value,strip):
     value=re.sub(strip,'',str(value))
     return int(value)
+
+
+def sorted_dates(dates,as_str=True,strfmt='%Y-%m-%d'):
+    dates=[parse_date(d) for d in dates]
+    dates.sort()
+    if as_str:
+        dates=[d.strftime(strfmt) for d in dates]
+    return dates
+
+
+def mid_date(date_1,date_2,as_str=True,strfmt='%Y-%m-%d'):
+    date_1,date_2=parse_date(date_1), parse_date(date_2)
+    date=date_1+(date_2-date_1)/2
+    if as_str:
+        date=date.strftime(strfmt) 
+    return date
+
+
+def max_min_dates(dates,as_str=True,strfmt='%Y-%m-%d'):
+    dates=sorted_dates(dates,as_str=as_str,strfmt=strfmt)
+    return min_date, max_date
+        
+
+def parse_date(date):
+    if isinstance(date,datetime):
+        return date
+    else:
+        if isinstance(date,int):
+            date=str(date)
+            parts=(int(d[:4]),int(d[4:6]),int(d[6:]))
+        elif isinstance(date,str):
+            parts=[int(d) for d in date.split('-')]
+        elif isinstance(date,[tuple,list]):
+            parts=date
+        return datetime(*parts)
 
 

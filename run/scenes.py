@@ -75,6 +75,7 @@ def _scenes_job(product,region,force,noisy,limit):
             args_list=args_list,
             save_results=info.path_root(path),
             save_errors=info.path_root(path),
+            results_dir='data/scenes',
             modules=MODULES,
             requirements=REQUIREMENTS,
             cpu_job=True,

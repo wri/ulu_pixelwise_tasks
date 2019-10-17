@@ -1,1 +1,0 @@
-{"ERROR": "delete() missing 1 required positional argument: 'dls_root'", "ARGS": [], "KWARGS": {"kwargs": {"filename": "cpu-model.h5", "key": "models/dev/cpu-model.h5"}}}

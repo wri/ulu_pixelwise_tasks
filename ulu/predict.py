@@ -105,7 +105,7 @@ def product_image(
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
         band_images.append(h.crop(cmask,pad))
-    return np.dstack(band_images), rinfo
+    return np.dstack(band_images), lulc, rinfo
 
 
 
@@ -137,6 +137,7 @@ def predict(
         dates=None,
         cloud_mask=False,
         water_mask=True,
+        mode_product_id=None,
         ERROR=None,
         ARGS=None,
         KWARGS=None ):
@@ -169,11 +170,14 @@ def predict(
             scene_ids,
             tile_key,
             input_bands)
-        for i in range(len(scene_ids)):
+        scene_count=len(scene_ids)
+        out=[]
+        lulcs=[]
+        for i in range(scene_count):
             meta['date']=dates[i]
             meta['cloud_score']=cloud_scores[i]
             meta['scene_ids']=str(scene_ids[i])
-            im,rinfo=product_image(
+            im, lulc, rinfo=product_image(
                 product=product,
                 tile_key=tile_key,
                 scene_ids=scene_ids[i],
@@ -192,7 +196,27 @@ def predict(
                 product,
                 scene_ids[i],
                 tile_key)
-            return _upload_scene(product_id,image_id,im,rinfo,meta)
+            lulcs.append(lulc)
+            out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
+        if mode_product_id:
+            mode,counts=h.mode(np.stack(lulcs))
+            mode_im=np.stack([counts/scene_count,mode,counts])
+            meta.pop('cloud_mask')
+            meta.pop('cloud_score')
+            meta.pop('water_mask')
+            dates=h.sorted_dates(dates)
+            meta['date']=h.mid_date(dates[0],dates[-1])
+            meta['dates']=', '.join(dates)
+            meta['tile_score']=mode_im[0].mean()
+            meta['scene_count']=scene_count
+            out.append(
+                _upload_scene(
+                    mode_product_id,
+                    image_id,
+                    im,
+                    rinfo,
+                    meta))
+        return out
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):

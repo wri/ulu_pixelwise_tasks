@@ -28,9 +28,10 @@ MODULES=[
     'dl_jobs'
 ]
 REQUIREMENTS=[
-    'tensorflow==1.12.0',
+    'tensorflow==1.14.0',
     'numba==0.43.1'
 ]
+
 GPUS=1
 CPUS=2
 TASK_KWARGS={ 'memory': '10Gi' }
