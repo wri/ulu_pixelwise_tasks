@@ -43,39 +43,41 @@ Here is an example walk through for [test_prod](https://github.com/wri/ulu_pixel
 1. You can create the product, add bands to the product and upload the model by running this:
 
 ```bash
-$ dl_jobs run setup test_prod
+$ dl_jobs run setup mexico_city
+# if creating a mode product also add that product and bands
+$ dl_jobs run product.create mexico_city_mode --dev f
+$ dl_jobs run product.add_bands mexico_city_mode --dev f
 ```
 
-2. You then will need to generate the list of DLTiles to run.  For simple polygons: 
+2. You then will need to generate the list of DLTiles to run.  For complicated polygons we are still managing tile creation by hand.  See this [notebook](https://nbviewer.jupyter.org/github/wri/ulu_pixelwise_tasks/blob/master/nb_archive/UrbanIndiaTiles.ipynb) as an example. For simple polygons you can pass `as_dl_job=True`: 
 
 ```bash
-$ dl_jobs run setup.tiles test_prod --dev f
+# this reminds you we are currently setting up complex tiling in notebooks
+dl_jobs run setup.tiles test_prod --dev f
+# this example runs based on local shape file (note: this may be a long running task)
+dl_jobs run setup.tiles mexico_city as_dl_job=True --dev f
 ```
 
-However for complicated polygons we are still managing tile creation by hand.  See this [notebook](https://nbviewer.jupyter.org/github/wri/ulu_pixelwise_tasks/blob/master/nb_archive/UrbanIndiaTiles.ipynb) as an example.
+3. Before prediction you have to select the S2-scenes of interest.  This can happen on the fly or be precomputed before hand. 
 
-3. Before prediction you have to select the S2-scenes of interest.  This can happen on the fly or be precomputed before hand. To compute the S2-scenes on the fly simply run:
+We currently recommend computing on the fly but if you do want to pre-compute the best S2-scenes run the line below. Otherwise skip to prediction.
 
 ```bash
-$ dl_jobs run predict test_prod --dev f
+# it is recommended you skip this step
+dl_jobs run scenes test_prod --dev f
 ```
 
-To pre-compute the best S2-scenes run:
+Finally run the prediction task:
 
 ```bash
-$ dl_jobs run scenes test_prod --dev f
+dl_jobs run predict test_prod --dev f
 ```
 
-and then:
+4. ~~Finally if you want to delete the product~~ DELETION DISABLED:
 
 ```bash
-$ dl_jobs run predict test_prod --dev f
-```
-
-4. Finally if you want to delete the product:
-
-```
-$ dl_jobs run product.delete test_prod confirm=True
+# deletion has been disabled to avoid accidents. delete product using DL web-UI
+# dl_jobs run product.delete test_prod confirm=True
 ```
 
 ---

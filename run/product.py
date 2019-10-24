@@ -43,6 +43,29 @@ def add_band(product,band_index,**kwargs):
     return job
 
 
+def update_bands(product,**kwargs):
+    band_configs=info.get_bands_kwargs_list(product)
+    job=DLJob(
+        module_name='ulu.product',
+        method_name='update_bands',
+        args=band_configs,
+        platform_job=False,
+        noisy=kwargs.get('noisy',True))
+    return job
+
+
+def update_band(product,band_index,**kwargs):
+    band_configs=info.get_bands_kwargs_list(product)
+    band_index=int(band_index)
+    job=DLJob(
+        module_name='ulu.product',
+        method_name='update_band',
+        kwargs=band_configs[band_index],
+        platform_job=False,
+        noisy=kwargs.get('noisy',True))
+    return job
+
+
 #
 # DELETION TASKS
 #

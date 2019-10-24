@@ -6,6 +6,17 @@ from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.load as load
 import utils.dlabs as dlabs
+
+
+NO_DELETE_MESSAGE=(
+    "Deletion has been disabled to prevent "
+    "accidental removal of products. "
+    "Delete product through the web-ui or "
+    "by running the following command:  "
+    "out=Catalog().remove_product(product_id=product_id,cascade=cascade)  "
+)
+
+
 #
 # PRODUCT
 #
@@ -41,17 +52,13 @@ def create(
 @attempt
 @expand_args
 def delete(product_id,cascade):
-    out=Catalog().remove_product(
-        product_id=product_id, 
-        cascade=cascade )
-    return out
+    raise ValueError(NO_DELETE_MESSAGE)
 
 
 
 #
 # BANDS
 #
-from pprint import pprint
 @as_json
 @attempt
 @expand_args
@@ -66,6 +73,23 @@ def add_bands(*bands):
 @expand_args
 def add_band(**kwargs):
     out=Catalog().add_band( **kwargs )
+    return out
+
+
+@as_json
+@attempt
+@expand_args
+def update_bands(*bands):
+    out=[ update_band(b) for b in bands ]
+    return out 
+
+
+
+@as_json
+@attempt
+@expand_args
+def update_band(**kwargs):
+    out=Catalog().change_band( **kwargs )
     return out
 
 

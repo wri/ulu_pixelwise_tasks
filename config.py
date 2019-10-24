@@ -35,3 +35,10 @@ CONFIRM_DELETE="ULU.product.delete/remove: pass 'confirm=True' to delete product
 WATER_MASK_BAND='water_mask'
 CLOUD_MASK_BAND='cloud_mask'
 
+
+""" COLORS:
+0    Open Space    #b2df8a  (178, 223, 138)
+1    Non-Residential    #fb9a99 (251,154,153)
+4    Residential    #1f78b4  (31, 120, 180)
+6    Roads    #e31a1c (227, 26, 28)
+"""
