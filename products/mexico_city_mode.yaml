@@ -1,0 +1,62 @@
+product:
+  owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
+  name: mexico_city_test_mode
+  description: description of test product
+  resolution: 5m
+  read: 'org:wri'
+bands:
+    - name: scores
+      description: percentage of lulc for all tiles (counts/nb_scenes)
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: class
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      colormap:
+        - [178, 223, 138, 255]
+        - [188, 122, 168, 255]
+        - [176, 210, 232, 255]
+        - [115, 179, 216, 255]
+        - [62, 142, 196, 255]
+        - [21, 99, 170, 255]
+        - [119, 119, 119, 255]
+      type: class
+    - name: counts
+      description: percentage of lulc for all tiles
+      data_range: [0,255]
+      nodata: 0
+      color: Undefined
+      type: derived
+band_defaults:
+    dtype: Byte
+    nbits: 8
+    resolution_unit: meters
+input:
+    products:
+        - 'sentinel-2:L1C'
+    bands:
+        - blue
+        - green
+        - red
+        - nir
+        - swir1
+        - swir2
+        - alpha
+model: 
+    filename: 6cat_9city_2img_Mexico.hd5
+    key: 6cat_9city_2img_Mexico.hd5
+run:
+    regions:
+        - mexico_city_dev
+    size: 512
+    # size: 1024
+    pad: window
+    window: 17
+    start_date: '2017-11-01'
+    end_date: '2018-01-15'
+    nb_scenes: 5

@@ -43,10 +43,10 @@ Here is an example walk through for [test_prod](https://github.com/wri/ulu_pixel
 1. You can create the product, add bands to the product and upload the model by running this:
 
 ```bash
-$ dl_jobs run setup mexico_city
+dl_jobs run setup mexico_city
 # if creating a mode product also add that product and bands
-$ dl_jobs run product.create mexico_city_mode --dev f
-$ dl_jobs run product.add_bands mexico_city_mode --dev f
+dl_jobs run product.create mexico_city_mode --dev f
+dl_jobs run product.add_bands mexico_city_mode --dev f
 ```
 
 2. You then will need to generate the list of DLTiles to run.  For complicated polygons we are still managing tile creation by hand.  See this [notebook](https://nbviewer.jupyter.org/github/wri/ulu_pixelwise_tasks/blob/master/nb_archive/UrbanIndiaTiles.ipynb) as an example. For simple polygons you can pass `as_dl_job=True`: 
@@ -57,6 +57,8 @@ dl_jobs run setup.tiles test_prod --dev f
 # this example runs based on local shape file (note: this may be a long running task)
 dl_jobs run setup.tiles mexico_city as_dl_job=True --dev f
 ```
+
+After creating the tile-set update the yaml file `run: tile_set: ...` with the name of the file.
 
 3. Before prediction you have to select the S2-scenes of interest.  This can happen on the fly or be precomputed before hand. 
 

@@ -52,7 +52,7 @@ def prediction(
         use_multiprocessing=False,
         max_queue_size=1,
         workers=1 )
-    return preds.reshape((size,size,3),order='F')
+    return preds.reshape((size,size,preds.shape[-1]),order='F')
 
 
 def category_prediction(preds,mask):

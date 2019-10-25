@@ -1,0 +1,57 @@
+product:
+  owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
+  name: bads_mode
+  description: description of test product
+  resolution: 5m
+  read: 'org:wri'
+bands:
+    - name: scores
+      description: percentage of lulc for all tiles (counts/nb_scenes)
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: class
+      description: landuse/landcover classes
+      data_range: [0,255]
+      nodata: 255
+      color: Palette
+      colormap:
+        - [178, 223, 138, 255]
+        - [251,154,153, 255]
+        - [31, 120, 180, 255]
+      type: class
+    - name: counts
+      description: percentage of lulc for all tiles
+      data_range: [0,255]
+      nodata: 0
+      color: Undefined
+      type: derived
+band_defaults:
+    dtype: Byte
+    nbits: 8
+    resolution_unit: meters
+input:
+    products:
+        - 'sentinel-2:L1C'
+    bands:
+        - blue
+        - green
+        - red
+        - nir
+        - swir1
+        - swir2
+        - alpha
+model: 
+    filename: 3cat_all_exclusions.hd5
+    key: 3cat_all_exclusions.hd5
+run:
+    regions:
+        - sitapur_dev_2
+    size: 32
+    pad: window
+    window: 17
+    start_date: '2017-11-01'
+    end_date: '2018-01-15'
+    nb_scenes: 5

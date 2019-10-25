@@ -43,7 +43,6 @@ def stack_cloud_mask(im,bands_first=False,threshold=0.20):
     return np.logical_and(index, (abs(grey) < threshold))
 
 
-
 def image_cloud_score(im,bands_first=False,threshold=0.20):
     im=preprocess(im)
     im=cloud_mask(im,bands_first=bands_first,threshold=threshold)
