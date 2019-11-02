@@ -1,7 +1,7 @@
 product:
     owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
-    mode_product_name: test_prod_mode
-    name: test_prod
+    name: india_dev_aois
+    mode_product_name: india_dev_aois_mode
     description: description of test product
     resolution: 5m
     read: 'org:wri'
@@ -19,9 +19,9 @@ bands:
       nodata: 255
       color: Palette
       colormap:
-        - [102, 141, 60, 255]
-        - [169, 161, 140, 255]
-        - [73, 56, 41, 255]
+        - [178, 223, 138, 255]
+        - [251, 154, 153, 255]
+        - [31, 120, 180, 255]
       type: class
     - name: cloud_score
       description: mean cloud value(0 or 1) in window of pixel
@@ -53,17 +53,11 @@ input:
 model: 
     filename: 3cat_all_exclusions.hd5
     key: 3cat_all_exclusions.hd5
-    # filename: multi_city_2img-fast.h5
-    # key: multi_city_2img-fast.h5
 run:
-    # tile_set: sitapur_dev_2-5:32:8.p
-    # tile_set: urban_india-5:512:8-b4.p
-    # tile_set: urban_india-5:1024:8-DEV660.p
-    tile_set: urban_india-5:512:8-b0.p
-    # scene_set: urban_india-5:1024:8-DEV660-5:20171101:20180115_Jun.03.2019.06:12:49.ndjson
+    tile_set: india_dev_aois-5:512:8.p
     regions:
-        - urban_india
-    size: 32
+        - india_dev_aois
+    size: 512
     pad: window
     window: 17
     start_date: '2017-11-01'

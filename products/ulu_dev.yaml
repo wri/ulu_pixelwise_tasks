@@ -17,9 +17,9 @@ bands:
       nodata: 255
       color: Palette
       colormap:
-        - [102, 141, 60, 255]
-        - [169, 161, 140, 255]
-        - [73, 56, 41, 255]
+        - [178, 223, 138, 255]
+        - [251, 154, 153, 255]
+        - [31, 120, 180, 255]
       type: class
     - name: cloud_score
       description: mean cloud value(0 or 1) in window of pixel
