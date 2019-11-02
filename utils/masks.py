@@ -5,6 +5,8 @@ import numpy as np
 from numba import njit
 from utils.generator import WINDOW_PADDING, preprocess
 import utils.helpers as h
+
+BANDS_FIRST=False
 #
 # CLOUDS
 #
@@ -12,14 +14,21 @@ def default_cloud_score(clouds):
     return clouds.mean()
 
 
-def cloud_score(im,window,pad='window',noise=None,bands_first=False):
+def cloud_score(im,window,pad='window',noise=None,bands_first=BANDS_FIRST):
     im=preprocess(im,bands_last=(not bands_first))
     mask=cloud_mask(im,bands_first=bands_first)
     scores=map_cloud_scores(mask,window,pad=pad,noise=noise)
     return mask, scores
 
 
-def cloud_mask(im,bands_first=False,threshold=0.20):
+def cloud_mask(im,bands_first=BANDS_FIRST,threshold=0.20):
+    im=_rgb_rescale(
+            im,
+            bands=[2,1,0],
+            rgb_max=255,
+            im_max=3000,
+            dtype=np.float,
+            bands_first=bands_first)
     if bands_first:
         L2=im[1,:,:]
     else:
@@ -31,7 +40,14 @@ def cloud_mask(im,bands_first=False,threshold=0.20):
     return np.logical_and(index, (abs(grey) < threshold))
 
 
-def stack_cloud_mask(im,bands_first=False,threshold=0.20):
+def stack_cloud_mask(im,bands_first=BANDS_FIRST,threshold=0.20):
+    im=_rgb_rescale(
+            im,
+            bands=[2,1,0],
+            rgb_max=255,
+            im_max=3000,
+            dtype=np.float,
+            bands_first=bands_first)
     if bands_first:
         L2=im[:,1,:,:]
     else:
@@ -43,7 +59,7 @@ def stack_cloud_mask(im,bands_first=False,threshold=0.20):
     return np.logical_and(index, (abs(grey) < threshold))
 
 
-def image_cloud_score(im,bands_first=False,threshold=0.20):
+def image_cloud_score(im,bands_first=BANDS_FIRST,threshold=0.20):
     im=preprocess(im)
     im=cloud_mask(im,bands_first=bands_first,threshold=threshold)
     return im.mean()
@@ -57,7 +73,6 @@ def slow_map_cloud_scores(
         noise=None):
     pad=h.get_padding(pad,window)
     r=int(window/2)
-    print(clouds.shape)
     assert clouds.ndim==2
     assert clouds.shape[0]==clouds.shape[1]
     rows,cols=clouds.shape
@@ -105,12 +120,12 @@ def _njit_cloud_score(clouds,window):
 #
 # water
 #
-def calc_water_mask(im,idx_green=1,idx_nir=3,threshold=0.15,bands_first=False):
+def calc_water_mask(im,idx_green=1,idx_nir=3,threshold=0.15,bands_first=BANDS_FIRST):
     ndwi=h.spectral_index(im,idx_green,idx_nir,bands_first=bands_first)
     return ndwi > threshold
 
 
-def water_mask(arr,mask=None,bands_first=False):
+def water_mask(arr,mask=None,bands_first=BANDS_FIRST):
     water_mask=calc_water_mask(arr,bands_first=bands_first)
     if mask is not None:
         crp=int((water_mask.shape[1]-mask.shape[1])/2)
@@ -123,7 +138,7 @@ def water_mask(arr,mask=None,bands_first=False):
 #
 # OTHER
 #
-def blank_mask(arr,crp=None,bands_first=False):
+def blank_mask(arr,crp=None,bands_first=BANDS_FIRST):
     if bands_first:
         arr=arr[-1]
     else:
@@ -133,4 +148,38 @@ def blank_mask(arr,crp=None,bands_first=False):
         blank_mask=h.crop(blank_mask,crp)
     return blank_mask
 
+
+
+#
+# INTERNAL
+#
+def _rgb_rescale(
+        im,
+        bands=None,
+        rgb_max=255,
+        im_max=2500,
+        dtype=np.uint8,
+        bands_first=BANDS_FIRST):
+    if bands_first:
+        if bands:
+            im=im[bands]
+        else:
+            im=im[:3]
+    else:
+        if im.ndim==4:
+            if bands:
+                im=im[:,:,:,bands]
+            else:
+                im=im[:,:,:,:3]
+        else:
+            if bands:
+                im=im[:,:,bands]
+            else:
+                im=im[:,:,:3]
+    if im_max:
+        im=im.astype(np.float)*rgb_max/im_max
+    im=im.clip(0,rgb_max)
+    if dtype:
+        im=im.astype(dtype)
+    return im
 

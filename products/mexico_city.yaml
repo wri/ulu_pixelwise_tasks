@@ -1,7 +1,7 @@
 product:
     owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
-    mode_product_name: mexico_city_test_mode
-    name: mexico_city_test
+    name: mexico_city
+    mode_product_name: mexico_city_mode
     description: description of test product
     resolution: 5m
     read: 'org:wri'
@@ -59,11 +59,8 @@ model:
     key: 6cat_9city_2img_Mexico.hd5
 run:
     tile_set: mexico_city-5:512:8.p
-    # tile_set: mexico_city-5:1024:8-dev10.p
-    # tile_set: mexico_city_dev-5:32:8.p
     regions:
-        - mexico_city_dev
-    # size: 32
+        - mexico_city
     size: 512
     pad: window
     window: 17

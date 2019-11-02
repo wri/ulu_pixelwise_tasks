@@ -1,4 +1,5 @@
 from __future__ import print_function
+from datetime import datetime
 import os
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -77,6 +78,7 @@ def get_scenes_data(
 def dates_scene_ids(grouped_scenes):
     date_scene_ids=[_date_scene_ids(d,s) for d,s in grouped_scenes]
     dates,scene_ids_list=list(zip(*date_scene_ids))
+    dates=_padded_dates(dates)
     return dates,scene_ids_list
 
 
@@ -140,5 +142,10 @@ def _img_date_scene_ids(img,date_tuple,grouped_scenes):
     return (img,)+_scene_ids(date_tuple,grouped_scenes)
 
 
+def _pad_date(date):
+    return datetime.strptime(date,"%Y-%m-%d").strftime("%Y-%m-%d")
 
+
+def _padded_dates(dates):
+    return [_pad_date(d) for d in dates]
 

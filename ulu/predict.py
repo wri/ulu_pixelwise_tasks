@@ -15,9 +15,6 @@ import ulu.model
 from ulu.scenes import get_scenes_data
 import tensorflow as tf
 from mproc import MPList
-
-
-from pprint import pprint
 #
 #   CONSTANTS
 #
@@ -138,6 +135,7 @@ def predict(
         cloud_mask=False,
         water_mask=True,
         mode_product_id=None,
+        mode_bands=None,
         ERROR=None,
         ARGS=None,
         KWARGS=None ):
@@ -200,7 +198,8 @@ def predict(
             out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
         if mode_product_id:
             mode,counts=h.mode(np.stack(lulcs))
-            mode_im=np.stack([counts/scene_count,mode,counts])
+            mode,counts=mode[0],counts[0]
+            mode_im=np.dstack([counts/scene_count,mode,counts])
             meta.pop('cloud_mask')
             meta.pop('cloud_score')
             meta.pop('water_mask')
@@ -209,11 +208,12 @@ def predict(
             meta['dates']=', '.join(dates)
             meta['tile_score']=mode_im[0].mean()
             meta['scene_count']=scene_count
+            rinfo['bands']=mode_bands
             out.append(
                 _upload_scene(
                     mode_product_id,
                     image_id,
-                    im,
+                    mode_im,
                     rinfo,
                     meta))
         return out

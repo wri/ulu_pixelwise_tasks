@@ -17,7 +17,7 @@ from config import WATER_MASK_BAND, CLOUD_MASK_BAND
 def get_tiles_path(product,region,limit):
     meta=load.meta(product)
     run_cfig=meta['run']
-    name=run_cfig.get('tile_set')   
+    name=run_cfig.get('tile_set') 
     if name:
         path='{}/{}'.format(TILES_DIR,name)
     else:
@@ -196,6 +196,15 @@ def get_predict_kwargs(product,region,limit):
         h.product_id(
             product_cfig.get('mode_product_name'),
             product_cfig.get('owner')))
+    if mode_product_id:
+        mode_product=product_cfig.get(
+            'mode_product_file',
+            product_cfig['mode_product_name'])
+        mode_meta=load.meta(mode_product)
+        mode_bands_cfig=mode_meta['bands']
+        mode_bands=[ b['name'] for b in mode_bands_cfig ]
+    else:
+        mode_bands=None
     product_bands=[ b['name'] for b in bands_cfig ]
     res,_,pad=h.resolution_size_padding(meta=meta)
     tiles_path=get_tiles_path(product,region,limit)
@@ -206,6 +215,7 @@ def get_predict_kwargs(product,region,limit):
             'product_id': product_id,
             'mode_product_id': mode_product_id,
             'bands': [ b['name'] for b in bands_cfig ],
+            'mode_bands': mode_bands,
             'model_filename': model_cfig.get('filename'),
             'model_key': model_cfig.get('key'),
             'window': run_cfig['window'],

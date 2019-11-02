@@ -1,6 +1,6 @@
 product:
   owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
-  name: bads_mode
+  name: bads_mode2
   description: description of test product
   resolution: 5m
   read: 'org:wri'
