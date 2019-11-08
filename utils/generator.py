@@ -11,16 +11,17 @@ from config import WINDOW_PADDING
 #
 # Helpers
 #
-def preprocess(im,bands_last=False):
+def preprocess(im,bands_last=False,pop_alpha=True):
     """
     - drop alpha
     - rescale
     - clip: 0,1
     """
-    if bands_last:
-        im=im[:,:,:-1]
-    else:
-        im=im[:-1]
+    if pop_alpha:
+        if bands_last:
+            im=im[:,:,:-1]
+        else:
+            im=im[:-1]
     return (im/10000.0).clip(0.0,1.0)
 
 

@@ -1,7 +1,7 @@
 product:
     owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
-    name: mexico_city
-    mode_product_name: mexico_city_mode
+    name: mexico
+    mode_product_name: mexico_mode
     description: description of test product
     resolution: 5m
     read: 'org:wri'
@@ -19,12 +19,12 @@ bands:
       nodata: 255
       color: Palette
       colormap:
-        - [178, 223, 138, 255]
-        - [188, 122, 168, 255]
-        - [176, 210, 232, 255]
-        - [115, 179, 216, 255]
-        - [62, 142, 196, 255]
-        - [21, 99, 170, 255]
+        - [106, 222, 172, 255]
+        - [255, 94, 97, 255]
+        - [253, 104, 255, 255]
+        - [237, 237, 135, 255]
+        - [11, 96, 200, 255]
+        - [ 0, 255, 255, 255]
         - [119, 119, 119, 255]
       type: class
     - name: cloud_score

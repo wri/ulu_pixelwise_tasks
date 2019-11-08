@@ -22,13 +22,7 @@ def cloud_score(im,window,pad='window',noise=None,bands_first=BANDS_FIRST):
 
 
 def cloud_mask(im,bands_first=BANDS_FIRST,threshold=0.20):
-    im=_rgb_rescale(
-            im,
-            bands=[2,1,0],
-            rgb_max=255,
-            im_max=3000,
-            dtype=np.float,
-            bands_first=bands_first)
+    im=preprocess(im,bands_last=(not bands_first),pop_alpha=False)
     if bands_first:
         L2=im[1,:,:]
     else:
@@ -41,13 +35,7 @@ def cloud_mask(im,bands_first=BANDS_FIRST,threshold=0.20):
 
 
 def stack_cloud_mask(im,bands_first=BANDS_FIRST,threshold=0.20):
-    im=_rgb_rescale(
-            im,
-            bands=[2,1,0],
-            rgb_max=255,
-            im_max=3000,
-            dtype=np.float,
-            bands_first=bands_first)
+    im=preprocess(im,bands_last=(not bands_first),pop_alpha=False)
     if bands_first:
         L2=im[:,1,:,:]
     else:
@@ -149,37 +137,4 @@ def blank_mask(arr,crp=None,bands_first=BANDS_FIRST):
     return blank_mask
 
 
-
-#
-# INTERNAL
-#
-def _rgb_rescale(
-        im,
-        bands=None,
-        rgb_max=255,
-        im_max=2500,
-        dtype=np.uint8,
-        bands_first=BANDS_FIRST):
-    if bands_first:
-        if bands:
-            im=im[bands]
-        else:
-            im=im[:3]
-    else:
-        if im.ndim==4:
-            if bands:
-                im=im[:,:,:,bands]
-            else:
-                im=im[:,:,:,:3]
-        else:
-            if bands:
-                im=im[:,:,bands]
-            else:
-                im=im[:,:,:3]
-    if im_max:
-        im=im.astype(np.float)*rgb_max/im_max
-    im=im.clip(0,rgb_max)
-    if dtype:
-        im=im.astype(dtype)
-    return im
 
