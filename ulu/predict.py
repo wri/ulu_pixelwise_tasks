@@ -205,7 +205,7 @@ def predict(
         if mode_product_id:
             mode,counts=h.mode(np.stack(lulcs))
             mode,counts=mode[0],counts[0]
-            mode_im=np.dstack([counts/scene_count,mode,counts])
+            mode_im=np.dstack([mode,counts/scene_count,counts])
             meta.pop('cloud_score')
             dates=h.sorted_dates(dates)
             meta['date']=h.mid_date(dates[0],dates[-1])

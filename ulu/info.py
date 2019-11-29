@@ -75,7 +75,9 @@ def path_root(path):
 # GET ARGS/KWARGS
 #
 def get_product_kwargs(product):
-    meta=load.product(product,'product')
+    meta=load.meta(product,'product')
+    from pprint import pprint
+    pprint(meta)
     meta['name']=meta.get('name',meta['id'].upper())
     return meta
 
@@ -95,7 +97,7 @@ def get_delete_product_kwargs(product,cascade):
 
 def get_bands_kwargs_list(product):
     """ product.add_bands """
-    meta=load.product(product)
+    meta=load.meta(product)
     bands_kwargs_list=[]
     for i,band in enumerate(meta['bands']):
         b=deepcopy(meta.get('band_defaults',{}))
@@ -143,16 +145,10 @@ def get_predict_kwargs(product,region,limit):
     model_cfig=meta['model']
     input_cfig=meta['input']
     bands_cfig=meta['bands']
-    product_id=product_cfig.get(
-        'product_id',
-        h.product_id(
-            product_cfig['name'],
-            product_cfig.get('owner')))
+    product_id=product_cfig['id']
     mode_product_id=product_cfig.get(
         'mode_product_id',
-        h.product_id(
-            product_cfig.get('mode_product_name'),
-            product_cfig.get('owner')))
+        product_cfig.get('mode_product_name'))
     if mode_product_id:
         mode_product=product_cfig.get(
             'mode_product_file',
@@ -168,7 +164,7 @@ def get_predict_kwargs(product,region,limit):
     scenes_path=get_scenes_path(tiles_path,product)
     scene_set=os.path.basename(scenes_path)
     return {
-            'product': product_cfig['name'],
+            'product': product_cfig.get('name',product_id.upper()),
             'product_id': product_id,
             'mode_product_id': mode_product_id,
             'bands': [ b['name'] for b in bands_cfig ],
