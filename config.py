@@ -42,3 +42,15 @@ CLOUD_MASK_BAND='cloud_mask'
 4    Residential    #1f78b4  (31, 120, 180)
 6    Roads    #e31a1c (227, 26, 28)
 """
+
+""" CATEGORIES
+
+- Open Space 
+- Non-Residential 
+- Residential Atomistic 
+- Residential Informal Subdivision 
+- Residential Formal Subdivision 
+- Residential Housing Project 
+- Roads 
+
+"""

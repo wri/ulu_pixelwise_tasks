@@ -107,7 +107,7 @@ def product_image(
         pad=pad )
     lulc=category_prediction(preds,blank_mask)
     cscores=h.crop(cscores,pad)
-    band_images=[ preds.max(axis=-1), lulc, cscores ]
+    band_images=[ lulc, preds.max(axis=-1), cscores ]
     if water_mask:
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
