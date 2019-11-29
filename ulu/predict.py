@@ -11,7 +11,8 @@ import utils.helpers as h
 import utils.masks as masks
 import utils.dlabs as dlabs
 from utils.generator import ImageSampleGenerator
-from config import WINDOW,WINDOW_PADDING,RESAMPLER
+from config import WINDOW, WINDOW_PADDING, RESAMPLER
+from config import VALUE_CATEGORIES, NB_CATS
 import ulu.model
 from ulu.scenes import get_scenes_data
 import tensorflow as tf

@@ -36,6 +36,21 @@ WATER_MASK_BAND='water_mask'
 CLOUD_MASK_BAND='cloud_mask'
 
 
+#
+# DATA
+#
+VALUE_CATEGORIES={
+    0: 'Open Space',
+    1: 'Non-Residential',
+    2: 'Residential Atomistic',
+    3: 'Residential Informal Subdivision',
+    4: 'Residential Formal Subdivision',
+    5: 'Residential Housing Project',
+    6: 'No Data',
+}
+NB_CATS=len(VALUE_CATEGORIES)
+
+
 """ COLORS:
 0    Open Space    #b2df8a  (178, 223, 138)
 1    Non-Residential    #fb9a99 (251,154,153)
@@ -43,14 +58,5 @@ CLOUD_MASK_BAND='cloud_mask'
 6    Roads    #e31a1c (227, 26, 28)
 """
 
-""" CATEGORIES
 
-- Open Space 
-- Non-Residential 
-- Residential Atomistic 
-- Residential Informal Subdivision 
-- Residential Formal Subdivision 
-- Residential Housing Project 
-- Roads 
 
-"""
