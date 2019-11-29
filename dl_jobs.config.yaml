@@ -1,4 +1,5 @@
 # dl_jobs: config
+# cpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7/default:v2019.11.18-6-ga7ee1224
 cpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.6/default:v2019.04.18-13-g565aebde
 cpu_job: true
 cpus: 1

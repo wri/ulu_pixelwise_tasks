@@ -1,8 +1,8 @@
 product:
     owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
-    name: mexico
-    mode_product_name: mexico_mode
-    mode_product_file: mexico_city_mode
+    name: mexico_1day
+    # mode_product_name: mexico_1day_mode
+    # mode_product_file: mexico_city_mode
     description: description of test product
     resolution: 5m
     read: 'org:wri'
@@ -65,13 +65,13 @@ run:
     size: 512
     pad: window
     window: 17
-    # start_date: '2017-11-01'
-    # end_date: '2018-01-15'
-    start_date: '2018-11-01'
-    end_date: '2019-01-15'
+    start_date: '2017-11-01'
+    end_date: '2018-01-15'
+    # start_date: '2018-11-01'
+    # end_date: '2019-01-15'
     # start_date: '2019-08-15'
     # end_date: '2019-11-01'
-    nb_scenes: 5
+    nb_scenes: 1
 
 
 

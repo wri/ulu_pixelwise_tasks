@@ -3,7 +3,6 @@ import os
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from glob import glob
-from tensorflow.python.keras.models import load_model
 # import tensorflow.python.keras.initializers.glorot_uniform as glorot_uniform
 from descarteslabs.client.services.storage import Storage
 from dl_jobs.decorators import as_json, expand_args, attempt
@@ -46,6 +45,7 @@ def load(key=None,filename=None,storage_root=None,path=None):
             path=h.model_path(filename=filename)
     if path:
         import tensorflow as tf
+        from tensorflow.python.keras.models import load_model
         print("LOADING MODEL: ",path)
         print("TENSORFLOW VERSION: ",tf.__version__)
         mdl=load_model(

@@ -79,22 +79,32 @@ def product_image(
     rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
-    """ multiprocess """
-    mp_list=MPList()
-    mp_list.append(
-        prediction,
+    # """ multiprocess """
+    # mp_list=MPList()
+    # mp_list.append(
+    #     prediction,
+    #     im.astype(DTYPE),
+    #     model_key=model_key,
+    #     model_filename=model_filename,
+    #     window=window,
+    #     pad=pad )
+    # mp_list.append(
+    #     masks.cloud_score,
+    #     im,
+    #     window=window,
+    #     pad=pad )
+    # preds,(cmask,cscores)=mp_list.run()
+    # """" end-multiprocess """
+    preds=prediction(
         im.astype(DTYPE),
         model_key=model_key,
         model_filename=model_filename,
         window=window,
         pad=pad )
-    mp_list.append(
-        masks.cloud_score,
+    (cmask,cscores)=masks.cloud_score(
         im,
         window=window,
         pad=pad )
-    preds,(cmask,cscores)=mp_list.run()
-    """" end-multiprocess """
     lulc=category_prediction(preds,blank_mask)
     cscores=h.crop(cscores,pad)
     band_images=[ preds.max(axis=-1), lulc, cscores ]
