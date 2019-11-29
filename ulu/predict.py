@@ -153,10 +153,7 @@ def predict(
             'model': model_filename,
             'tile_key': tile_key,
             'region_name': region,
-            'resolution': resolution,
-            'scene_set': scene_set,
-            'cloud_mask': str(cloud_mask),
-            'water_mask': str(water_mask)
+            'scene_set': scene_set
         }
     if ERROR:
         return {
@@ -182,7 +179,6 @@ def predict(
         out=[]
         lulcs=[]
         for i in range(scene_count):
-            meta['date']=dates[i]
             meta['cloud_score']=cloud_scores[i]
             meta['scene_ids']=str(scene_ids[i])
             im, lulc, rinfo=product_image(
@@ -205,14 +201,12 @@ def predict(
                 scene_ids[i],
                 tile_key)
             lulcs.append(lulc)
-            out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
+            out.append(_upload_scene(product_id,image_id,dates[i],im,rinfo,meta))
         if mode_product_id:
             mode,counts=h.mode(np.stack(lulcs))
             mode,counts=mode[0],counts[0]
             mode_im=np.dstack([counts/scene_count,mode,counts])
-            meta.pop('cloud_mask')
             meta.pop('cloud_score')
-            meta.pop('water_mask')
             dates=h.sorted_dates(dates)
             meta['date']=h.mid_date(dates[0],dates[-1])
             meta['dates']=', '.join(dates)
@@ -229,31 +223,43 @@ def predict(
         return out
 
 
-def _upload_scene(product_id,image_id,im,rinfo,meta):
-    upload_id=Catalog().upload_ndarray(
-            ndarray=im,
-            product_id=product_id,
-            image_id=image_id,
-            raster_meta=rinfo,
-            extra_properties=meta,
-            acquired=meta['date'] )
-    hist=np.unique(im[:,:,1],return_counts=True)
-    cats=hist[0]
-    counts=hist[1]
+def _upload_scene(product_id,image_id,date,im,rinfo,meta):
+    dl_img=Image(
+        product_id=Product.namespace_id(Product.namespace_id(product_id)), 
+        name=image_id)
+    hist=_get_histogram(im[1])
+    meta['date']=date
+    meta['shape']=str(im.shape)
+    meta['hist']=str(hist)
+    dl_img.acquired=date
+    dl_img.extra_properties=meta
+    dl_img.upload_ndarray(
+        im,
+        upload_options=None, 
+        raster_meta=rinfo,
+        overviews=OVERVIEWS,
+        overview_resampler=OVERVIEW_RESAMPLER)
+    return {
+        'ACTION': 'predict',
+        'SUCCESS': True,
+        'image_id': image_id,
+        'product_id': product_id,
+        'shape': im.shape,
+        'hist': hist
+    }
+
+
+def _get_histogram(class_band):
+    cats,counts=_cats_and_counts(class_band)
+    hist={ cat: cnt for cat,cnt in zip(cats,counts) }
+    return { VALUE_CATEGORIES[cat]: hist.get(cat,0) for cat in range(NB_CATS) }
+
+
+def _cats_and_counts(class_band):
+    cats,counts=np.unique(class_band,return_counts=True)
     if isinstance(cats,np.ma.core.MaskedArray):
         cats=cats.data
     cats=[ int(c) for c  in cats ]
     counts=[ int(c) for c  in counts ]
-    return {
-        'ACTION': 'predict',
-        'SUCCESS': True,
-        'upload_id': upload_id,
-        'image_id': image_id,
-        'product_id': product_id,
-        'shape': im.shape,
-        'hist': {
-            'categories': list(cats),
-            'counts': list(counts)
-        }
-    }
+    return cats, counts
 
