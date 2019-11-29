@@ -4,7 +4,8 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import numpy as np
 import descarteslabs as dl
-from descarteslabs.client.services.catalog import Catalog
+from descarteslabs.catalog import Image, Product, OverviewResampler
+from descarteslabs.scenes import DLTile
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.masks as masks
