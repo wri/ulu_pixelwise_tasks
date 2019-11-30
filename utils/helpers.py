@@ -190,6 +190,9 @@ def image_id(prods,pname,sid,tkey=None):
         name='{}+{}'.format(name,slen)
     if tkey:
         name='{}:{}'.format(name,tkey)
+    # update for oo-catalog restrictions    
+    name=re.sub(':','_',name)
+    name=re.sub(r'\+','-',name)
     return name
 
     
