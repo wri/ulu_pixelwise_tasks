@@ -22,7 +22,8 @@ from mproc import MPList
 #
 DTYPE='float32'
 MULTI_PROCESS=True
-
+OVERVIEWS=[2,4]
+OVERVIEW_RESAMPLER=OverviewResampler.MODE
 
 
 #
