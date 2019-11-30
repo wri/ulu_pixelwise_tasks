@@ -69,8 +69,6 @@ def product_image(
         tile_key,
         scene_ids,
         im,
-        rinfo,
-        bands,
         input_bands,
         window,
         model_key,
@@ -78,7 +76,6 @@ def product_image(
         pad=WINDOW_PADDING,
         cloud_mask=False,
         water_mask=True ):
-    rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     if MULTI_PROCESS:
@@ -114,7 +111,7 @@ def product_image(
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
         band_images.append(h.crop(cmask,pad))
-    return np.dstack(band_images), lulc, rinfo
+    return np.dstack(band_images), lulc
 
 
 
@@ -153,7 +150,6 @@ def predict(
         KWARGS=None ):
     meta={
             'model': model_filename,
-            'tile_key': tile_key,
             'region_name': region,
             'scene_set': scene_set
         }
@@ -180,16 +176,15 @@ def predict(
         scene_count=len(scene_ids)
         out=[]
         lulcs=[]
+        lulc_tile_key=dlabs.update_tile_key_padding(tile_key)
+        rinfo=dlabs.raster_info(lulc_tile_key,bands)
+        meta['tile_key']=lulc_tile_key
         for i in range(scene_count):
-            meta['cloud_score']=cloud_scores[i]
-            meta['scene_ids']=str(scene_ids[i])
-            im, lulc, rinfo=product_image(
+            im, lulc=product_image(
                 product=product,
                 tile_key=tile_key,
                 scene_ids=scene_ids[i],
                 im=stack[i],
-                rinfo=rinfo,
-                bands=bands,
                 input_bands=input_bands,
                 window=window,
                 model_key=model_key,
@@ -197,12 +192,14 @@ def predict(
                 pad=pad,
                 cloud_mask=cloud_mask,
                 water_mask=water_mask )
+            lulcs.append(lulc)
             image_id=h.image_id(
                 input_products,
                 product,
                 scene_ids[i],
-                tile_key)
-            lulcs.append(lulc)
+                lulc_tile_key)
+            meta['cloud_score']=cloud_scores[i]
+            meta['scene_ids']=str(scene_ids[i])
             out.append(_upload_scene(product_id,image_id,dates[i],im,rinfo,meta))
         if mode_product_id:
             mode,counts=h.mode(np.stack(lulcs))
