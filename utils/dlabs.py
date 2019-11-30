@@ -76,6 +76,21 @@ def stack(
         return stk, rinfo[0]
 
 
+def update_tile_key_padding(tile_key,padding=0):
+    parts=tile_key.split(":")
+    return ":".join([parts[0],str(padding)]+parts[2:])
+
+
+def raster_info(aoi,bands):
+    if dh.is_str(aoi):
+        aoi=DLTile.from_key(aoi)
+    meta=_coordinate_info(aoi).copy()
+    meta['bands']=bands
+    return meta
+
+
+
+
 #
 # MAIN
 #
@@ -119,5 +134,27 @@ def get_tile_keys(
         return tile_keys, info
     else:
         return tile_keys
+
+
+
+#
+# INTERNAL
+#
+def _coordinate_info(aoi):
+    sz=aoi.tilesize + (2 * aoi.pad)
+    meta={
+        'coordinateSystem': {
+            'proj4': aoi.proj4,
+            'wkt': aoi.wkt
+        },
+        'driverLongName': 'In Memory Raster',
+        'driverShortName': 'MEM',
+        'geoTransform': aoi.geotrans,
+        'metadata': {'': {'Corder': 'RPCL', 'id': '*'}},
+        'size': [sz, sz],
+        'files': []
+    }
+    return meta
+
 
 

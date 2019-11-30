@@ -67,8 +67,6 @@ def product_image(
         tile_key,
         scene_ids,
         im,
-        rinfo,
-        bands,
         input_bands,
         window,
         model_key,
@@ -76,7 +74,6 @@ def product_image(
         pad=WINDOW_PADDING,
         cloud_mask=False,
         water_mask=True ):
-    rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
     # """ multiprocess """
@@ -112,7 +109,7 @@ def product_image(
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
         band_images.append(h.crop(cmask,pad))
-    return np.dstack(band_images), lulc, rinfo
+    return np.dstack(band_images), lulc
 
 
 
@@ -151,7 +148,6 @@ def predict(
         KWARGS=None ):
     meta={
             'model': model_filename,
-            'tile_key': tile_key,
             'region_name': region,
             'resolution': resolution,
             'scene_set': scene_set,
@@ -182,16 +178,11 @@ def predict(
         out=[]
         lulcs=[]
         for i in range(scene_count):
-            meta['date']=dates[i]
-            meta['cloud_score']=cloud_scores[i]
-            meta['scene_ids']=str(scene_ids[i])
-            im, lulc, rinfo=product_image(
+            im, lulc=product_image(
                 product=product,
                 tile_key=tile_key,
                 scene_ids=scene_ids[i],
                 im=stack[i],
-                rinfo=rinfo,
-                bands=bands,
                 input_bands=input_bands,
                 window=window,
                 model_key=model_key,
@@ -205,7 +196,13 @@ def predict(
                 scene_ids[i],
                 tile_key)
             lulcs.append(lulc)
-            out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
+            lulc_tile_key=dlabs.update_tile_key_padding(tile_key)
+            lulc_rinfo=dlabs.raster_info(lulc_tile_key,bands)
+            meta['date']=dates[i]
+            meta['cloud_score']=cloud_scores[i]
+            meta['scene_ids']=str(scene_ids[i])
+            meta['tile_key']=lulc_tile_key
+            out.append(_upload_scene(product_id,image_id,im,lulc_rinfo,meta))
         if mode_product_id:
             mode,counts=h.mode(np.stack(lulcs))
             mode,counts=mode[0],counts[0]
@@ -218,13 +215,13 @@ def predict(
             meta['dates']=', '.join(dates)
             meta['tile_score']=mode_im[0].mean()
             meta['scene_count']=scene_count
-            rinfo['bands']=mode_bands
+            lulc_rinfo['bands']=mode_bands
             out.append(
                 _upload_scene(
                     mode_product_id,
                     image_id,
                     mode_im,
-                    rinfo,
+                    lulc_rinfo,
                     meta))
         return out
 
@@ -256,4 +253,5 @@ def _upload_scene(product_id,image_id,im,rinfo,meta):
             'counts': list(counts)
         }
     }
+
 

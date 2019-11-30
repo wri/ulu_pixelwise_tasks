@@ -65,13 +65,13 @@ run:
     size: 512
     pad: window
     window: 17
-    start_date: '2017-11-01'
-    end_date: '2018-01-15'
-    # start_date: '2018-11-01'
-    # end_date: '2019-01-15'
+    # start_date: '2017-11-01'
+    # end_date: '2018-01-15'
+    start_date: '2018-11-01'
+    end_date: '2019-01-15'
     # start_date: '2019-08-15'
     # end_date: '2019-11-01'
-    nb_scenes: 1
+    nb_scenes: 5
 
 
 
