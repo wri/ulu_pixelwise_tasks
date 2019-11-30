@@ -21,7 +21,7 @@ from mproc import MPList
 #   CONSTANTS
 #
 DTYPE='float32'
-
+MULTI_PROCESS=True
 
 
 
@@ -81,32 +81,32 @@ def product_image(
     rinfo['bands']=bands
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
-    # """ multiprocess """
-    # mp_list=MPList()
-    # mp_list.append(
-    #     prediction,
-    #     im.astype(DTYPE),
-    #     model_key=model_key,
-    #     model_filename=model_filename,
-    #     window=window,
-    #     pad=pad )
-    # mp_list.append(
-    #     masks.cloud_score,
-    #     im,
-    #     window=window,
-    #     pad=pad )
-    # preds,(cmask,cscores)=mp_list.run()
-    # """" end-multiprocess """
-    preds=prediction(
-        im.astype(DTYPE),
-        model_key=model_key,
-        model_filename=model_filename,
-        window=window,
-        pad=pad )
-    (cmask,cscores)=masks.cloud_score(
-        im,
-        window=window,
-        pad=pad )
+    if MULTI_PROCESS:
+        mp_list=MPList()
+        mp_list.append(
+            prediction,
+            im.astype(DTYPE),
+            model_key=model_key,
+            model_filename=model_filename,
+            window=window,
+            pad=pad )
+        mp_list.append(
+            masks.cloud_score,
+            im,
+            window=window,
+            pad=pad )
+        preds,(cmask,cscores)=mp_list.run()
+    else:
+        preds=prediction(
+            im.astype(DTYPE),
+            model_key=model_key,
+            model_filename=model_filename,
+            window=window,
+            pad=pad )
+        (cmask,cscores)=masks.cloud_score(
+            im,
+            window=window,
+            pad=pad )
     lulc=category_prediction(preds,blank_mask)
     cscores=h.crop(cscores,pad)
     band_images=[ lulc, preds.max(axis=-1), cscores ]
