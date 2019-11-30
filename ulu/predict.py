@@ -112,7 +112,7 @@ def product_image(
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
         band_images.append(h.crop(cmask,pad))
-    return np.dstack(band_images), lulc
+    return np.stack(band_images), lulc
 
 
 
@@ -205,7 +205,7 @@ def predict(
         if mode_product_id:
             mode,counts=h.mode(np.stack(lulcs))
             mode,counts=mode[0],counts[0]
-            mode_im=np.dstack([mode,counts/scene_count,counts])
+            mode_im=np.stack([mode,counts/scene_count,counts])
             meta.pop('cloud_score')
             dates=h.sorted_dates(dates)
             meta['date']=h.mid_date(dates[0],dates[-1])
