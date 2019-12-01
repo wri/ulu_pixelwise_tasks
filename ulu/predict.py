@@ -10,7 +10,8 @@ import utils.helpers as h
 import utils.masks as masks
 import utils.dlabs as dlabs
 from utils.generator import ImageSampleGenerator
-from config import WINDOW,WINDOW_PADDING,RESAMPLER
+from config import WINDOW, WINDOW_PADDING, RESAMPLER
+from config import VALUE_CATEGORIES, NB_CATS
 import ulu.model
 from ulu.scenes import get_scenes_data
 import tensorflow as tf
@@ -150,9 +151,7 @@ def predict(
             'model': model_filename,
             'region_name': region,
             'resolution': resolution,
-            'scene_set': scene_set,
-            'cloud_mask': str(cloud_mask),
-            'water_mask': str(water_mask)
+            'scene_set': scene_set
         }
     if ERROR:
         return {
@@ -219,9 +218,7 @@ def predict(
                 mode,counts=h.mode(np.stack(lulcs))
                 mode,counts=mode[0],counts[0]
                 mode_im=np.dstack([counts/scene_count,mode,counts])
-                meta.pop('cloud_mask')
-                meta.pop('cloud_score')
-                meta.pop('water_mask')
+                meta.pop('cloud_score',None)
                 meta['date']=mode_date
                 meta['dates']=', '.join(dates)
                 meta['tile_score']=mode_im[0].mean()
@@ -239,6 +236,9 @@ def predict(
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):
+    hist=_get_histogram(im[:,:,1])
+    meta['shape']=str(im.shape)
+    meta['hist']=str(hist)
     upload_id=Catalog().upload_ndarray(
             ndarray=im,
             product_id=product_id,
@@ -246,13 +246,7 @@ def _upload_scene(product_id,image_id,im,rinfo,meta):
             raster_meta=rinfo,
             extra_properties=meta,
             acquired=meta['date'] )
-    hist=np.unique(im[:,:,1],return_counts=True)
-    cats=hist[0]
-    counts=hist[1]
-    if isinstance(cats,np.ma.core.MaskedArray):
-        cats=cats.data
-    cats=[ int(c) for c  in cats ]
-    counts=[ int(c) for c  in counts ]
+
     return {
         'ACTION': 'predict',
         'SUCCESS': True,
@@ -260,10 +254,22 @@ def _upload_scene(product_id,image_id,im,rinfo,meta):
         'image_id': image_id,
         'product_id': product_id,
         'shape': im.shape,
-        'hist': {
-            'categories': list(cats),
-            'counts': list(counts)
-        }
+        'hist': hist
     }
+
+
+def _get_histogram(class_band):
+    cats,counts=_cats_and_counts(class_band)
+    hist={ cat: cnt for cat,cnt in zip(cats,counts) }
+    return { VALUE_CATEGORIES[cat]: hist.get(cat,0) for cat in range(NB_CATS) }
+
+
+def _cats_and_counts(class_band):
+    cats,counts=np.unique(class_band,return_counts=True)
+    if isinstance(cats,np.ma.core.MaskedArray):
+        cats=cats.data
+    cats=[ int(c) for c  in cats ]
+    counts=[ int(c) for c  in counts ]
+    return cats, counts
 
 
