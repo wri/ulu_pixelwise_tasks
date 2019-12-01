@@ -215,12 +215,17 @@ def predict(
                         rinfo,
                         meta))
             if mode_product_id:
+                dates=h.sorted_dates(dates)
+                mode_date=h.mid_date(dates[0],dates[-1])
+                image_id=h.mode_image_id(
+                    mode_product_id,
+                    mode_date,
+                    lulc_tile_key)
                 mode,counts=h.mode(np.stack(lulcs))
                 mode,counts=mode[0],counts[0]
                 mode_im=np.stack([mode,counts/scene_count,counts])
                 meta.pop('cloud_score')
-                dates=h.sorted_dates(dates)
-                meta['date']=h.mid_date(dates[0],dates[-1])
+                meta['date']=mode_date
                 meta['dates']=', '.join(dates)
                 meta['tile_score']=mode_im[0].mean()
                 meta['scene_count']=scene_count
@@ -229,7 +234,7 @@ def predict(
                     _upload_scene(
                         mode_product_id,
                         image_id,
-                        meta['date'],
+                        mode_date,
                         mode_im,
                         rinfo,
                         meta))
@@ -241,7 +246,7 @@ def _upload_scene(product_id,image_id,date,im,rinfo,meta):
     dl_img=Image(
         product_id=Product.namespace_id(Product.namespace_id(product_id)), 
         name=image_id)
-    hist=_get_histogram(im[1])
+    hist=_get_histogram(im[0])
     meta['date']=date
     meta['shape']=str(im.shape)
     meta['hist']=str(hist)

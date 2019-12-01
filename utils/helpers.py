@@ -195,6 +195,11 @@ def image_id(prods,pname,sid,tkey=None):
     name=re.sub(r'\+','-',name)
     return name
 
+
+def mode_image_id(product_id,date,tile_key):
+    tile_key=re.sub(':','_',tile_key)
+    return f'{product_id.upper()}_{date}_{tile_key}'
+
     
 #
 # META/CONFIG
