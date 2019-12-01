@@ -62,7 +62,7 @@ def task(product,region=ALL,**kwargs):
 def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
     tiles_path=info.get_tiles_path(product,region,limit)
     scenes_path=info.get_scenes_path(tiles_path,product)
-    if os.path.isfile(scenes_path):
+    if scenes_path and os.path.isfile(scenes_path):
         args_list=ndj.read(scenes_path)
     else:
         print(WARN_NO_SCENES.format(scenes_path))

@@ -33,8 +33,10 @@ def create(
         resolution,
         notes, 
         **kwargs):
+    if isinstance(start_datetime,list):
+        start_datetime=start_datetime[0]
+        end_datetime=start_datetime[-1]
     resolution="{}m".format(resolution)
-    notes=h.notes(notes)
     out=Catalog().add_product(
         product_id=product_id,
         title=title,

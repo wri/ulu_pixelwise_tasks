@@ -35,19 +35,22 @@ def get_tiles_path(product,region,limit):
 
 def get_scenes_path(tiles_path,product):
     run_cfig=load.meta(product,'run')
-    name=run_cfig.get('scene_set')   
-    if name:
-        path='{}/{}'.format(SCENES_DIR,name)
+    if isinstance(run_cfig['start_date'],list):
+        return False
     else:
-        nb_scenes=run_cfig['nb_scenes']
-        start_date=run_cfig['start_date']
-        end_date=run_cfig['end_date']
-        path=h.scenes_path(
-            tiles_path,
-            nb_scenes,
-            start_date,
-            end_date)
-    return path
+        name=run_cfig.get('scene_set')   
+        if name:
+            path='{}/{}'.format(SCENES_DIR,name)
+        else:
+            nb_scenes=run_cfig['nb_scenes']
+            start_date=run_cfig['start_date']
+            end_date=run_cfig['end_date']
+            path=h.scenes_path(
+                tiles_path,
+                nb_scenes,
+                start_date,
+                end_date)
+        return path
 
 
 def get_prediction_path(scenes_path,product):
@@ -97,21 +100,7 @@ def get_product_kwargs(product,date_index=None,region_index=None):
             'start_datetime': run_cfig['start_date'],
             'end_datetime': run_cfig['end_date'],
             'resolution': res,
-            'notes': { 
-                'product': name,
-                'regions': regions,
-                'start_datetime': run_cfig['start_date'],
-                'end_datetime': run_cfig['end_date'],
-                'resolution': res,
-                'size': size,
-                'pad': pad,
-                'water_mask': 'water_mask' in product_bands,
-                'cloud_mask': 'cloud_mask' in product_bands,
-                'input_products': input_cfig['products'],
-                'input_bands': input_cfig['bands'],
-                'window': run_cfig['window'],
-                'model_filename': model_cfig.get('filename')
-            }
+            'notes': product_cfig.get('notes')
         }
 
 
@@ -209,7 +198,10 @@ def get_predict_kwargs(product,region,limit):
     res,_,pad=h.resolution_size_padding(meta=meta)
     tiles_path=get_tiles_path(product,region,limit)
     scenes_path=get_scenes_path(tiles_path,product)
-    scene_set=os.path.basename(scenes_path)
+    if scenes_path:
+        scene_set=os.path.basename(scenes_path)
+    else:
+        scene_set=f"multi-set: {run_cfig['start_date']}, {run_cfig['end_date']}"
     return {
             'product': product_cfig['name'],
             'product_id': product_id,
