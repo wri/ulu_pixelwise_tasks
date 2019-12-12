@@ -78,9 +78,14 @@ def update_bands(*bands):
 @attempt
 @expand_args
 def update_band(**kwargs):
-    # out=Catalog().change_band( **kwargs )
-    # return out
-    raise NotImplementedError('TODO: update band with oo catalog')
+    band_type=kwargs.pop('type',None)
+    band_name=kwargs.pop('name')
+    product_id=Product.namespace_id(kwargs.pop('product_id'))
+    namespaced_band_name=f'{product_id}:{band_name}'
+    b=band.get(f'{product_id}:{band_name}')
+    b=_update_object(b,kwargs)
+    return b.save()
+
 
 
 
