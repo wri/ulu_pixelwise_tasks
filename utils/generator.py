@@ -36,13 +36,14 @@ class ImageSampleGenerator(Sequence):
                 pad=WINDOW_PADDING,
                 look_window=17,
                 prep_image=False,
-                bands_last=True):
+                bands_first_model=False):
+        self.bands_last=True
+        self.bands_first_model=bands_first_model
         if prep_image:
-            image=preprocess(image,bands_last)
+            image=preprocess(image,self.bands_last)
         self.image=image
         self.pad=h.get_padding(pad,look_window)
         self.look_window=look_window
-        self.bands_last=bands_last
         self._set_data(image)
     
     # eventually this should all be happening beforehand
@@ -82,6 +83,8 @@ class ImageSampleGenerator(Sequence):
             raise ValueError('illegal batch index:',str(index))
         self.batch_index=index
         inputs=self._get_inputs(index)
+        if self.bands_first_model:
+            inputs=inputs.swapaxes(3,2).swapaxes(2,1)
         return inputs
 
 

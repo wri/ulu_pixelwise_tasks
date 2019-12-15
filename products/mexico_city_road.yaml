@@ -54,8 +54,7 @@ model:
     key: 6cat_9city_2img_Mexico.hd5
 run:
     # tile_set: mexico_city-5:512:8.p
-    tile_set: mexico_city-5:512:8-dev4  0.p
-    # tile_set: mexico_city_dev-5:32:8.p
+    tile_set: mexico_city_dev-5:32:8.p
     regions:
         - mexico_city_dev
     # size: 32

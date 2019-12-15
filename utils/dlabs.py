@@ -6,6 +6,7 @@ import json
 from pprint import pprint
 import descarteslabs as dl
 from descarteslabs.scenes import Scene, SceneCollection, DLTile
+from descarteslabs.client.services.catalog import Catalog
 import utils.helpers as h
 import utils.load as load
 import dl_jobs.helpers as dh
@@ -89,7 +90,22 @@ def raster_info(aoi,bands):
     return meta
 
 
-
+def delete_product(
+        product_id,
+        add_namespace=False,
+        cascade=True,
+        i_am_absolutely_sure=False):
+    """ WARNING: THIS DELETES THE PRODUCT AND ALL IMAGERY
+    """
+    if i_am_absolutely_sure:
+        resp=Catalog().remove_product(
+            product_id, 
+            add_namespace=add_namespace, 
+            cascade=cascade )
+        return resp
+    else:
+        print(f'DO YOU REALLY WANT TO DELETE {product_id}?')
+        return False
 
 #
 # MAIN

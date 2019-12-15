@@ -31,6 +31,7 @@ def prediction(
         arr,
         model_key=None,
         model_filename=None,
+        bands_first_model=False,
         window=WINDOW,
         pad=WINDOW_PADDING,
         prep_image=True):
@@ -38,7 +39,8 @@ def prediction(
         arr,
         pad=pad,
         look_window=window,
-        prep_image=prep_image)
+        prep_image=prep_image,
+        bands_first_model=bands_first_model)
     size=arr.shape[1]-2*h.get_padding(pad,window)
     model=ulu.model.load(
         key=model_key,
@@ -72,6 +74,7 @@ def product_image(
         window,
         model_key,
         model_filename,
+        bands_first_model,
         pad=WINDOW_PADDING,
         cloud_mask=False,
         water_mask=True ):
@@ -84,6 +87,7 @@ def product_image(
             im.astype(DTYPE),
             model_key=model_key,
             model_filename=model_filename,
+            bands_first_model=bands_first_model,
             window=window,
             pad=pad )
         mp_list.append(
@@ -134,6 +138,7 @@ def predict(
         window,
         model_key,
         model_filename,
+        bands_first_model,
         pad,
         resolution,
         scene_set,
@@ -195,6 +200,7 @@ def predict(
                     window=window,
                     model_key=model_key,
                     model_filename=model_filename,
+                    bands_first_model=bands_first_model,
                     pad=pad,
                     cloud_mask=cloud_mask,
                     water_mask=water_mask )

@@ -210,6 +210,7 @@ def get_predict_kwargs(product,region,limit):
             'mode_bands': mode_bands,
             'model_filename': model_cfig.get('filename'),
             'model_key': model_cfig.get('key'),
+            'bands_first_model': model_cfig.get('bands_first_model',False),
             'window': run_cfig['window'],
             'water_mask': WATER_MASK_BAND in product_bands,
             'cloud_mask': CLOUD_MASK_BAND in product_bands,
