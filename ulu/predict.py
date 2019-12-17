@@ -4,7 +4,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import numpy as np
 import descarteslabs as dl
-from descarteslabs.client.services.catalog import Catalog
+from descarteslabs.catalog import Image, Product, OverviewResampler
 from dl_jobs.decorators import as_json, expand_args, attempt
 import utils.helpers as h
 import utils.masks as masks
@@ -21,7 +21,8 @@ from mproc import MPList
 #
 DTYPE='float32'
 MULTI_PROCESS=True
-
+OVERVIEWS=[2,4,6,8]
+OVERVIEW_RESAMPLER=OverviewResampler.MODE
 
 
 #
@@ -114,7 +115,7 @@ def product_image(
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
         band_images.append(h.crop(cmask,pad))
-    return np.dstack(band_images), lulc
+    return np.stack(band_images), lulc
 
 
 
@@ -249,7 +250,7 @@ def predict(
                     lulc_tile_key)
                 mode,counts=h.mode(np.stack(lulcs))
                 mode,counts=mode[0],counts[0]
-                mode_im=np.dstack([counts/scene_count,mode,counts])
+                mode_im=np.stack([counts/scene_count,mode,counts])
                 if isinstance(mode_im,np.ma.core.MaskedConstant):
                     out.append({
                         'ACTION': 'predict',
@@ -279,26 +280,37 @@ def predict(
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):
-    hist=_get_histogram(im[:,:,1])
-    meta['shape']=str(im.shape)
-    meta['hist']=str(hist)
-    upload_id=Catalog().upload_ndarray(
-            ndarray=im,
-            product_id=product_id,
-            image_id=image_id,
+    try:
+        dl_img=Image(
+            product_id=Product.namespace_id(product_id), 
+            name=image_id)
+        dl_img.acquired=meta['date']
+        hist=_get_histogram(im[0])
+        meta['shape']=str(im.shape)
+        meta['hist']=str(hist)
+        dl_img.extra_properties=meta
+        dl_img.upload_ndarray(
+            im,
+            upload_options=None, 
             raster_meta=rinfo,
-            extra_properties=meta,
-            acquired=meta['date'] )
-
-    return {
-        'ACTION': 'predict',
-        'SUCCESS': True,
-        'upload_id': upload_id,
-        'image_id': image_id,
-        'product_id': product_id,
-        'shape': im.shape,
-        'hist': hist
-    }
+            overviews=OVERVIEWS,
+            overview_resampler=OVERVIEW_RESAMPLER)
+        return {
+            'ACTION': 'predict',
+            'SUCCESS': True,
+            'image_id': image_id,
+            'product_id': product_id,
+            'shape': im.shape,
+            'hist': hist
+        }
+    except Exception as e:
+        return {
+            'ACTION': 'predict',
+            'SUCCESS': False,
+            'image_id': image_id,
+            'product_id': product_id,
+            'error': str(e),
+        }
 
 
 def _get_histogram(class_band):

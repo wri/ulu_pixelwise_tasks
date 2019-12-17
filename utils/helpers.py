@@ -39,21 +39,43 @@ def crop(arr,size,bands_first=True):
 
 
 def spectral_index(im,b1,b2,eps=EPS,bands_first=False,is_stack=False):
+    if isinstance(im,np.ma.core.MaskedArray):
+        mask=im.mask
+        is_masked=isinstance(mask,np.ndarray)
+        im=im.data
+    else:
+        is_masked=None
     if is_stack:
         if bands_first:
             b1=im[:,b1]
             b2=im[:,b2]
+            if is_masked:
+                mask=mask[:,0]
         else:
             b1=im[:,:,:,b1]
             b2=im[:,:,:,b2]
+            if is_masked:
+                mask=mask[:,:,:,0]    
     else:
         if bands_first:
             b1=im[b1]
             b2=im[b2]
+            if is_masked:
+                mask=mask[0]    
         else:
             b1=im[:,:,b1]
             b2=im[:,:,b2]
-    return np.divide(b1-b2,b1+b2+eps).clip(-1.0,1.0)
+            if is_masked:
+                mask=mask[:,:,0]
+    numr=b1-b2
+    denom=np.nan_to_num(b1+b2)
+    denom[denom==0]=eps
+    if (denom==0).all():
+        denom=eps
+    im=np.divide(numr,denom).clip(-1.0,1.0)
+    if is_masked:
+        im=np.ma.array(im,mask=mask)
+    return im
 
 
 def mode(a, axis=0):
@@ -344,5 +366,6 @@ def parse_date(date):
         elif isinstance(date,[tuple,list]):
             parts=date
         return datetime(*parts)
+
 
 

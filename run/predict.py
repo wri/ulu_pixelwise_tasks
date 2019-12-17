@@ -70,8 +70,11 @@ def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
         tile_keys=h.read_pickle(tiles_path)
         args_list=dh.update_list(scenes_kwargs,tile_keys,'tile_key')
     results_path, add_timestamp=info.get_prediction_path(tiles_path,product)
-    kwargs=info.get_predict_kwargs(product,region,limit)
+    kwargs=info.get_predict_kwargs(product,region,None)
     args_list=dh.update_list(kwargs,args_list)
+    if limit:
+        print(f'LIMIT: {len(args_list)}->{limit}')
+        args_list=args_list[:int(limit)]
     job=DLJob(
         module_name='ulu.predict',
         method_name='predict',

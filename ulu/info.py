@@ -73,36 +73,13 @@ def path_root(path):
 
 
 
-
 #
 # GET ARGS/KWARGS
 #
-def get_product_kwargs(product,date_index=None,region_index=None):
-    meta=load.meta(product)
-    run_cfig=meta['run']
-    product_cfig=meta['product']
-    model_cfig=meta['model']
-    input_cfig=meta['input']
-    bands_cfig=meta['bands']
-    name=product_cfig['name']
-    product_id=product_cfig.get(
-        'product_id',
-        h.product_id(product_cfig['name'],product_cfig.get('owner')))
-    product_title=h.product_title(product_cfig['name'],product_cfig.get('title'))
-    res,size,pad=h.resolution_size_padding(meta=meta)
-    product_bands=[ b['name'] for b in bands_cfig ]
-    regions=h.extract_list(run_cfig['regions'],region_index)
-    return {
-            'product_id': product_id,
-            'title': product_title,
-            'description': product_cfig.get('description',name),
-            'read': product_cfig.get('read'),
-            'start_datetime': run_cfig['start_date'],
-            'end_datetime': run_cfig['end_date'],
-            'resolution': res,
-            'notes': product_cfig.get('notes')
-        }
-
+def get_product_kwargs(product):
+    meta=load.meta(product,'product')
+    meta['name']=meta.get('name',meta['id'].upper())
+    return meta
 
 
 def get_delete_product_kwargs(product,cascade):
@@ -120,21 +97,13 @@ def get_delete_product_kwargs(product,cascade):
 def get_bands_kwargs_list(product):
     """ product.add_bands """
     meta=load.meta(product)
-    product_cfig=meta['product']
-    band_cfigs=meta['bands']
-    band_defaults=meta.get('band_defaults',{})
-    product_id=h.product_id(product_cfig['name'],product_cfig.get('owner'))
     bands_kwargs_list=[]
-    default_resolution=band_defaults.get(
-        'resolution',
-        h.strip_to_int(product_cfig['resolution'],'m') 
-    )
-    for i,band in enumerate(band_cfigs):
-        b=deepcopy(band_defaults)
-        b['product_id']=product_id
-        b['srcband']=i+1
-        b['resolution']=band.pop('resolution',default_resolution)
-        b['read']=b.get('read',product_cfig.get('read'))
+    for i,band in enumerate(meta['bands']):
+        b=deepcopy(meta.get('band_defaults',{}))
+        b['product_id']=meta['product'].get('id')
+        b['band_index']=i
+        b['resolution']=band.get('resolution')
+        b['read']=b.get('read',meta['product'].get('read'))
         b.update(band)
         bands_kwargs_list.append(b)
     return bands_kwargs_list
@@ -175,11 +144,7 @@ def get_predict_kwargs(product,region,limit):
     model_cfig=meta['model']
     input_cfig=meta['input']
     bands_cfig=meta['bands']
-    product_id=product_cfig.get(
-        'product_id',
-        h.product_id(
-            product_cfig['name'],
-            product_cfig.get('owner')))
+    product_id=product_cfig.get('id')
     mode_product_id=product_cfig.get(
         'mode_product_id',
         h.product_id(
@@ -203,7 +168,7 @@ def get_predict_kwargs(product,region,limit):
     else:
         scene_set=f"multi-set: {run_cfig['start_date']}, {run_cfig['end_date']}"
     return {
-            'product': product_cfig['name'],
+            'product': product_cfig.get('name',product_id),
             'product_id': product_id,
             'mode_product_id': mode_product_id,
             'bands': [ b['name'] for b in bands_cfig ],
