@@ -191,30 +191,56 @@ def predict(
             rinfo=dlabs.raster_info(lulc_tile_key,bands)
             meta['tile_key']=lulc_tile_key
             for i in range(scene_count):
-                im, lulc=product_image(
-                    product=product,
-                    tile_key=tile_key,
-                    scene_ids=scene_ids[i],
-                    im=stack[i],
-                    input_bands=input_bands,
-                    window=window,
-                    model_key=model_key,
-                    model_filename=model_filename,
-                    bands_first_model=bands_first_model,
-                    pad=pad,
-                    cloud_mask=cloud_mask,
-                    water_mask=water_mask )
+                inpt=stack[i]
                 image_id=h.image_id(
                     input_products,
                     product,
                     scene_ids[i],
                     lulc_tile_key)
-                lulcs.append(lulc)
-                meta['date']=dates[i]
-                meta['cloud_score']=cloud_scores[i]
-                meta['scene_ids']=str(scene_ids[i])
-                out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
-            if mode_product_id:
+                if isinstance(inpt,np.ma.core.MaskedConstant):
+                    out.append({
+                        'ACTION': 'predict',
+                        'SUCCESS': False,
+                        'image_id': image_id,
+                        'product_id': product_id,
+                        'failure': 'MaskedConstant',
+                        'pos': 0,
+                        'mode': False
+                    })
+                else:
+                    im, lulc=product_image(
+                        product=product,
+                        tile_key=tile_key,
+                        scene_ids=scene_ids[i],
+                        im=inpt,
+                        input_bands=input_bands,
+                        window=window,
+                        model_key=model_key,
+                        model_filename=model_filename,
+                        bands_first_model=bands_first_model,
+                        pad=pad,
+                        cloud_mask=cloud_mask,
+                        water_mask=water_mask )
+                    if (
+                        isinstance(im,np.ma.core.MaskedConstant) or 
+                        isinstance(lulc,np.ma.core.MaskedConstant)
+                    ):
+                        out.append({
+                            'ACTION': 'predict',
+                            'SUCCESS': False,
+                            'image_id': image_id,
+                            'product_id': product_id,
+                            'failure': 'MaskedConstant',
+                            'pos': 1,
+                            'mode': False
+                        })
+                    else:
+                        lulcs.append(lulc)
+                        meta['date']=dates[i]
+                        meta['cloud_score']=cloud_scores[i]
+                        meta['scene_ids']=str(scene_ids[i])
+                        out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
+            if lulcs and mode_product_id:
                 dates=h.sorted_dates(dates)
                 mode_date=h.mid_date(dates[0],dates[-1])
                 image_id=h.mode_image_id(
@@ -224,19 +250,30 @@ def predict(
                 mode,counts=h.mode(np.stack(lulcs))
                 mode,counts=mode[0],counts[0]
                 mode_im=np.dstack([counts/scene_count,mode,counts])
-                meta.pop('cloud_score',None)
-                meta['date']=mode_date
-                meta['dates']=', '.join(dates)
-                meta['tile_score']=mode_im[0].mean()
-                meta['scene_count']=scene_count
-                rinfo['bands']=mode_bands
-                out.append(
-                    _upload_scene(
-                        mode_product_id,
-                        image_id,
-                        mode_im,
-                        rinfo,
-                        meta))
+                if isinstance(mode_im,np.ma.core.MaskedConstant):
+                    out.append({
+                        'ACTION': 'predict',
+                        'SUCCESS': False,
+                        'image_id': image_id,
+                        'product_id': product_id,
+                        'failure': 'MaskedConstant',
+                        'pos': 2,
+                        'mode': True
+                    })
+                else:
+                    meta.pop('cloud_score',None)
+                    meta['date']=mode_date
+                    meta['dates']=', '.join(dates)
+                    meta['tile_score']=mode_im[0].mean()
+                    meta['scene_count']=scene_count
+                    rinfo['bands']=mode_bands
+                    out.append(
+                        _upload_scene(
+                            mode_product_id,
+                            image_id,
+                            mode_im,
+                            rinfo,
+                            meta))
             outs.append(out)
         return out
 
