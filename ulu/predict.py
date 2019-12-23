@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os
+import re
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import numpy as np
@@ -21,7 +22,7 @@ from mproc import MPList
 #
 DTYPE='float32'
 MULTI_PROCESS=True
-OVERVIEWS=[2,4,6,8]
+OVERVIEWS=[2,4,6,8,10,12]
 OVERVIEW_RESAMPLER=OverviewResampler.MODE
 
 
@@ -110,7 +111,7 @@ def product_image(
             pad=pad )
     lulc=category_prediction(preds,blank_mask)
     cscores=h.crop(cscores,pad)
-    band_images=[ preds.max(axis=-1), lulc, cscores ]
+    band_images=[ lulc, preds.max(axis=-1), cscores ]
     if water_mask:
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
@@ -205,7 +206,7 @@ def predict(
                         'image_id': image_id,
                         'product_id': product_id,
                         'failure': 'MaskedConstant',
-                        'pos': 0,
+                        'trace_index': 0,
                         'mode': False
                     })
                 else:
@@ -232,7 +233,7 @@ def predict(
                             'image_id': image_id,
                             'product_id': product_id,
                             'failure': 'MaskedConstant',
-                            'pos': 1,
+                            'trace_index': 1,
                             'mode': False
                         })
                     else:
@@ -248,9 +249,10 @@ def predict(
                     mode_product_id,
                     mode_date,
                     lulc_tile_key)
+                image_id=re.sub(r':','/',image_id)
                 mode,counts=h.mode(np.stack(lulcs))
                 mode,counts=mode[0],counts[0]
-                mode_im=np.stack([counts/scene_count,mode,counts])
+                mode_im=np.stack([mode,counts/scene_count,counts])
                 if isinstance(mode_im,np.ma.core.MaskedConstant):
                     out.append({
                         'ACTION': 'predict',
@@ -258,7 +260,7 @@ def predict(
                         'image_id': image_id,
                         'product_id': product_id,
                         'failure': 'MaskedConstant',
-                        'pos': 2,
+                        'trace_index': 2,
                         'mode': True
                     })
                 else:
@@ -280,6 +282,9 @@ def predict(
 
 
 def _upload_scene(product_id,image_id,im,rinfo,meta):
+    image_id=h.update_date(image_id)
+    image_id=re.sub(r':','_',image_id)
+    image_id=re.sub(r'\+','--',image_id)
     try:
         dl_img=Image(
             product_id=Product.namespace_id(product_id), 

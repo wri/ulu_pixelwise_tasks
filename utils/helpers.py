@@ -25,6 +25,9 @@ AS_DATETIME=False
 CONFIG_LIST_TMPL="{}_{}:{}"
 SEP_RGX=r'[_\-\.\,/\ ]'
 
+DATE_REG=r'(([12]\d{3})-(0[1-9]|1[0-2]|[1-9])-(0[1-9]|[12]\d|3[01]|[1-9]))'
+
+
 #
 # IMAGE HELPERS
 #
@@ -78,9 +81,11 @@ def spectral_index(im,b1,b2,eps=EPS,bands_first=False,is_stack=False):
     return im
 
 
-def mode(a, axis=0):
+def mode(a, mask_value=255, axis=0):
     """ https://stackoverflow.com/a/12399155/607528
     """
+    if mask_value is not None:
+        a=np.ma.array(a,mask=(a==mask_value))
     scores = np.unique(np.ravel(a))
     testshape = list(a.shape)
     testshape[axis] = 1
@@ -303,6 +308,26 @@ def extract_date(dated_str,default=DEFAULT_DATE,as_datetime=AS_DATETIME):
         return datetime.strptime(date,YYYY_MM_DD)
     else:
         return date
+
+
+def clean_date(d):
+    p=d.split('-')
+    if len(p)==3:
+        p=[str(p[0]),str(p[1]).zfill(2),str(p[2]).zfill(2)]
+        return "".join(p)
+    elif len(p)==1:
+        return d
+    else:
+        raise ValueError(f'malformed date ({d})')
+        
+
+def update_date(name):
+    dates=re.search(DATE_REG,name)
+    if dates:
+        d=name[dates.start():dates.end()]
+        cd=clean_date(d)
+        name=re.sub(d,cd,name)
+    return name
 
 
 def start_end_datetimes(dates,as_datetime=False):
