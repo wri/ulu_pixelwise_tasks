@@ -87,8 +87,7 @@ def mode(a, mask_value=255, axis=0):
     if mask_value is not None:
         a=np.ma.array(a,mask=(a==mask_value))
     scores = np.unique(np.ravel(a))
-    testshape = list(a.shape)
-    testshape[axis] = 1
+    testshape=_njit_safe_shape_tuple(a,axis)
     oldmostfreq = np.zeros(testshape)
     oldcounts = np.zeros(testshape)
 
@@ -100,6 +99,44 @@ def mode(a, mask_value=255, axis=0):
         oldmostfreq = mostfrequent
 
     return mostfrequent, oldcounts
+
+
+def _njit_safe_shape_tuple(arr,axis):
+    testshape = list(arr.shape)
+    testshape[axis] = 1
+    shapetuple=()
+    for d in testshape:
+        shapetuple+=(d,)
+    return shapetuple
+    
+
+# def mode(a, mask_value=255, axis=0):
+#     """ https://stackoverflow.com/a/12399155/607528
+#     """
+#     out_mask=_get_mask(a,mask_value,axis)
+#     if mask_value is not None:
+#         a=np.ma.array(a,mask=(a==mask_value))
+#     scores = np.unique(np.ravel(a))
+#     testshape = list(a.shape)
+#     testshape[axis] = 1
+#     oldmostfreq = np.zeros(testshape)
+#     oldcounts = np.zeros(testshape)
+
+#     for score in scores:
+#         template = (a == score)
+#         counts = np.expand_dims(np.sum(template, axis),axis)
+#         mostfrequent = np.where(counts > oldcounts, score, oldmostfreq)
+#         oldcounts = np.maximum(counts, oldcounts)
+#         oldmostfreq = mostfrequent
+    
+#     a=np.ma.array(mostfrequent,mask=out_mask)
+#     return a, oldcounts
+
+
+# def _get_mask(a,mask_value,axis):
+#     umsk=(a!=mask_value)
+#     return (umsk.sum(axis=axis)==0)
+
 
 
 #
