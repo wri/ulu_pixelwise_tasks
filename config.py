@@ -54,8 +54,14 @@ NB_CATS=len(VALUE_CATEGORIES)
 
 
 """ COLORS:
-0    Open Space    #b2df8a  (178, 223, 138)
-1    Non-Residential    #fb9a99 (251,154,153)
-4    Residential    #1f78b4  (31, 120, 180)
-6    Roads    #e31a1c (227, 26, 28)
+'Open Space':    6ADE6A - [106, 222, 172, 255]
+'Non-Residential':    FF5E61 - [255, 94, 97, 255]
+'Residential Atomistic':    FD68FF - [253, 104, 255, 255]
+'Residential Informal Subdivision':    EDED87 - [237, 237, 135, 255]
+'Residential Formal Subdivision':    0b60c8 - [132, 225, 255, 255]
+'Residential Housing Project':    00ffff - [ 0, 123, 255, 255]
+'No Data':    777777 - [119, 119, 119, 255]
 """
+
+
+

@@ -94,15 +94,12 @@ def map_cloud_scores(
 def _njit_cloud_score(clouds,window):
     r=int(window/2)
     rows,cols=clouds.shape
-    score_map=np.full((rows,cols),-1)
-    scores=[]
-    for j in range(r,rows-r):
-        score_cols=[]
-        for i in range(r,cols-r):
-            clouds_window=clouds[j-r:j+r+1,i-r:i+r+1]
-            score_cols.append(clouds_window.mean())
-        scores.append(score_cols)
-    return np.array(scores)  
+    score_map=np.full((rows-2*r,cols-2*r),-1).astype(np.float32)
+    for j in range(rows-2*r):
+        for i in range(cols-2*r):
+            clouds_window=clouds[j:j+window,i:i+window]
+            score_map[j,i]=clouds_window.mean()
+    return score_map  
 
 
 #
