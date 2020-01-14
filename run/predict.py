@@ -47,19 +47,20 @@ def task(product,region=ALL,**kwargs):
     cpu_job=dh.truthy(kwargs.get('cpu',CPU_JOB))
     gpus=kwargs.get('gpus',GPUS)
     if gpus: gpus=int(gpus)
+    name=kwargs.get('name',None)
     limit=kwargs.get('limit',False)
     if region==ALL:
         regions=load.meta(product,'run','regions')
         jobs=[]
         for region in regions:
-            jobs.append(_predict_job(log,product,region,force,noisy,limit,cpu_job,gpus))
+            jobs.append(_predict_job(log,product,region,force,noisy,name,limit,cpu_job,gpus))
         return jobs
     else:
-        return _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus)
+        return _predict_job(log,product,region,force,noisy,name,limit,cpu_job,gpus)
 
 
 
-def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
+def _predict_job(log,product,region,force,noisy,name,limit,cpu_job,gpus):
     tiles_path=info.get_tiles_path(product,region,limit)
     scenes_path=info.get_scenes_path(tiles_path,product)
     if scenes_path and os.path.isfile(scenes_path):
@@ -78,6 +79,7 @@ def _predict_job(log,product,region,force,noisy,limit,cpu_job,gpus):
     job=DLJob(
         module_name='ulu.predict',
         method_name='predict',
+        name=name,
         args_list=args_list,
         save_results=info.path_root(results_path),
         results_timestamp=add_timestamp,
