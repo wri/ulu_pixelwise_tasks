@@ -81,26 +81,6 @@ def spectral_index(im,b1,b2,eps=EPS,bands_first=False,is_stack=False):
     return im
 
 
-# def mode(a, mask_value=255, axis=0):
-#     """ https://stackoverflow.com/a/12399155/607528
-#     """
-#     if mask_value is not None:
-#         a=np.ma.array(a,mask=(a==mask_value))
-#     scores = np.unique(np.ravel(a))
-#     testshape=_mode_shape(a,axis)
-#     oldmostfreq = np.zeros(testshape)
-#     oldcounts = np.zeros(testshape)
-
-#     for score in scores:
-#         template = (a == score)
-#         counts = np.expand_dims(np.sum(template, axis),axis)
-#         mostfrequent = np.where(counts > oldcounts, score, oldmostfreq)
-#         oldcounts = np.maximum(counts, oldcounts)
-#         oldmostfreq = mostfrequent
-
-#     return mostfrequent, oldcounts
-
-
 def mode(a, mask_value=255, axis=0):
     """ https://stackoverflow.com/a/12399155/607528
     """
