@@ -81,7 +81,33 @@ def spectral_index(im,b1,b2,eps=EPS,bands_first=False,is_stack=False):
     return im
 
 
-def mode(a, mask_value=255, axis=0):
+# def mode(a, mask_value=255, axis=0):
+#     """ https://stackoverflow.com/a/12399155/607528
+#     """
+#     out_mask=_get_mask(a,mask_value,axis)
+#     if mask_value is not None:
+#         a=np.ma.array(a,mask=(a==mask_value))
+#     scores = np.unique(np.ravel(a))
+#     testshape=_mode_shape(a,axis)
+#     oldmostfreq = np.zeros(testshape)
+#     oldcounts = np.zeros(testshape)
+
+#     for score in scores:
+#         template = (a == score)
+#         counts = np.expand_dims(np.sum(template, axis),axis)
+#         mostfrequent = np.where(counts > oldcounts, score, oldmostfreq)
+#         oldcounts = np.maximum(counts, oldcounts)
+#         oldmostfreq = mostfrequent
+#     a=np.ma.array(mostfrequent,mask=out_mask)
+#     print('\n'*5)
+#     print('---')
+#     print(mostfrequent.shape,out_mask.shape,a.shape)
+#     print('---')
+#     print('\n'*5)
+#     return a, oldcounts
+
+
+def mode(a, mask_value=255, axis=0, no_data_value=6):
     """ https://stackoverflow.com/a/12399155/607528
     """
     out_mask=_get_mask(a,mask_value,axis)
@@ -99,8 +125,21 @@ def mode(a, mask_value=255, axis=0):
         oldcounts = np.maximum(counts, oldcounts)
         oldmostfreq = mostfrequent
     
-    a=np.ma.array(mostfrequent,mask=out_mask)
-    return a, oldcounts
+    print('\n'*5)
+    print('---')
+    print(mostfrequent.shape,out_mask.shape,a.shape)
+
+    if no_data_value is None:
+        mostfrequent=np.ma.array(mostfrequent,mask=out_mask)
+    else:
+        mostfrequent[0][out_mask]=no_data_value
+
+    print('**',mostfrequent.shape)
+    print('---')
+    print('\n'*5)
+    
+    return mostfrequent, oldcounts
+
 
 
 def _get_mask(a,mask_value,axis):

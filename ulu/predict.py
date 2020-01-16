@@ -82,6 +82,9 @@ def product_image(
         water_mask=True ):
     pad=h.get_padding(pad,window)
     blank_mask=masks.blank_mask(im,pad)
+    print('\n')
+    print('::::::::::::::::::::')
+    print(im.shape)
     if MULTI_PROCESS:
         mp_list=MPList()
         mp_list.append(
@@ -109,9 +112,15 @@ def product_image(
             im,
             window=window,
             pad=pad )
+
     lulc=category_prediction(preds,blank_mask)
+    print(preds.shape,blank_mask.shape,lulc.shape)
+    print('-',cscores.shape)
     cscores=h.crop(cscores,pad)
+    print('-',cscores.shape)
     band_images=[ lulc, preds.max(axis=-1), cscores ]
+    print('::::::::::::::::::::')
+    print('\n')
     if water_mask:
         band_images.append(masks.water_mask(im,blank_mask))
     if cloud_mask:
@@ -169,10 +178,14 @@ def predict(
             'meta': meta
         }
     else:
+        print('PID',product_id)
+        print('MPID',mode_product_id)
+        print('\n'*10)
         if not isinstance(start_date,list):
             start_date=[start_date]
             end_date=[end_date]
         outs=[]
+        print('start:',start_date,end_date)
         for start,end in zip(start_date,end_date):
             if not scene_ids:
                 cloud_scores, dates, scene_ids=get_scenes_data(
@@ -223,6 +236,8 @@ def predict(
                         pad=pad,
                         cloud_mask=cloud_mask,
                         water_mask=water_mask )
+                    print('\n'*2)
+                    print('+++++++++',im.shape,lulc.shape)
                     if (
                         isinstance(im,np.ma.core.MaskedConstant) or 
                         isinstance(lulc,np.ma.core.MaskedConstant)
@@ -237,11 +252,14 @@ def predict(
                             'mode': False
                         })
                     else:
+                        print('boom',product_id,image_id,im.shape)
                         lulcs.append(lulc)
                         meta['date']=dates[i]
                         meta['cloud_score']=cloud_scores[i]
                         meta['scene_ids']=str(scene_ids[i])
                         out.append(_upload_scene(product_id,image_id,im,rinfo,meta))
+                    print('\n'*2)
+            print('>>>',len(lulcs),mode_product_id)
             if lulcs and mode_product_id:
                 dates=h.sorted_dates(dates)
                 mode_date=h.mid_date(dates[0],dates[-1])

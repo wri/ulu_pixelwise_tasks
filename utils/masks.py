@@ -87,6 +87,11 @@ def map_cloud_scores(
     """
     pad=h.get_padding(pad,window)
     scores=_njit_cloud_score(clouds,window)
+    print('\n')
+    print('>>>')
+    print(np.array(scores).shape,pad,np.pad(np.array(scores),(pad,pad),'constant',constant_values=-1).shape)
+    print('>>>')
+    print('\n')
     return np.pad(np.array(scores),(pad,pad),'constant',constant_values=-1)
 
 
@@ -101,6 +106,16 @@ def _njit_cloud_score(clouds,window):
             score_map[j,i]=clouds_window.mean()
     return score_map  
 
+# @njit(cache=False)
+# def _njit_cloud_score(clouds,window):
+#     r=int(window/2)
+#     rows,cols=clouds.shape
+#     score_map=np.full((rows,cols),-1).astype(np.float32)
+#     for j in range(r,rows-r):
+#         for i in range(r,cols-r):
+#             clouds_window=clouds[j:j+window,i:i+window]
+#             score_map[j,i]=clouds_window.mean()
+#     return score_map  
 
 #
 # water
