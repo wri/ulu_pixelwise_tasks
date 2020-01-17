@@ -1,7 +1,7 @@
 product:
-    id: hyderabad_msk_fix6
+    id: hyderabad_masked
     mode_product_file: hyderabad_mode
-    mode_product_name: hyderabad_msk_fix6_mode
+    mode_product_name: hyderabad_masked_mode
     description: >-
       land use classes and model outputs predicted from individual 
       sentinel-2 scenes
@@ -79,7 +79,7 @@ run:
     # tile_set: sitapur_dev_2-5:32:8.p
     tile_set: test_keys.p
     regions:
-        - hyderabad.geojson
+        - urban_india.geojson
     size: 512
     pad: window
     window: 17

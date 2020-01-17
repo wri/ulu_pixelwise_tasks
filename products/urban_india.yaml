@@ -1,10 +1,17 @@
 product:
     owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
-    name: india_dev_aois
-    mode_product_name: india_dev_aois_mode
-    description: description of test product
+    name: urban_land_use_predictions-india
+    mode_product_name: urban_land_use-india
+    mode_product_file: urban_india_mode
+    description: >-
+      land use classes and model outputs predicted from individual 
+      sentinel-2 scenes
     resolution: 5m
     read: 'org:wri'
+    notes: >-
+      see product "wri:urban_land_use-india" to obtain
+      land use classes
+    
 bands:
     - name: scores
       description: output probablity from model
@@ -19,9 +26,13 @@ bands:
       nodata: 255
       color: Palette
       colormap:
-        - [178, 223, 138, 255]
-        - [251, 154, 153, 255]
-        - [31, 120, 180, 255]
+        - [106, 222, 172, 255]
+        - [255, 94, 97, 255]
+        - [253, 104, 255, 255]
+        - [237, 237, 135, 255]
+        - [132, 225, 255, 255]
+        - [ 0, 123, 255, 255]
+        - [119, 119, 119, 255]
       type: class
     - name: cloud_score
       description: mean cloud value(0 or 1) in window of pixel
@@ -35,10 +46,12 @@ bands:
       data_range: [0,1]
       nodata: 1
       type: mask
+
 band_defaults:
     dtype: Byte
     nbits: 8
     resolution_unit: meters
+
 input:
     products:
         - 'sentinel-2:L1C'
@@ -51,17 +64,27 @@ input:
         - swir2
         - alpha
 model: 
-    filename: 3cat_all_exclusions.hd5
-    key: 3cat_all_exclusions.hd5
+    filename: 6cat_india-all_exc.hd5
+    key: 6cat_india-all_exc.hd5
 run:
-    tile_set: india_dev_aois-5:512:8.p
+    tile_set: 'urban_india-5:512:8-b5.p'
     regions:
-        - india_dev_aois
+        - test
     size: 512
     pad: window
     window: 17
-    start_date: '2017-11-01'
-    end_date: '2018-01-15'
+    # start_date: '2017-11-01'
+    # end_date: '2018-01-15'
+    start_date: '2018-11-01'
+    end_date: '2019-01-15'
+    # start_date: '2019-08-15'
+    # end_date: '2019-11-01'
+    # start_date:
+    #   - '2017-11-01'
+    #   - '2018-11-01'
+    # end_date:
+    #   - '2018-01-15'
+    #   - '2019-01-15'
     nb_scenes: 5
 
 

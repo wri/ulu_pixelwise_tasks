@@ -1,5 +1,6 @@
 product:
-    id: hyderabad_masked_mode
+    owner: 6d27def1bb7fb0138933a4ee2e33cce9f5af999a
+    name: urban_land_use-india
     description: land use classes and confidence for urban india
     resolution: 5m
     read: 'org:wri'
@@ -10,19 +11,18 @@ product:
       prediction divided by the number of predictions.
 
 bands:
-    - name: lulc
+    - name: confidence
+      description: percentage of lulc for all tiles (counts/nb_scenes)
+      dtype: Float32
+      nbits: 32
+      data_range: [0.0,1.0]
+      color: Undefined
+      type: derived
+    - name: class
       description: landuse/landcover classes
       data_range: [0,255]
-      display_range: [0,255]
-      nodata: 6
-      class_labels:
-        - Open Space 
-        - Non-Residential 
-        - Residential Atomistic 
-        - Residential Informal Subdivision 
-        - Residential Formal Subdivision 
-        - Residential Housing Project 
-        - No Data
+      nodata: 255
+      color: Palette
       colormap:
         - [106, 222, 172, 255]
         - [255, 94, 97, 255]
@@ -31,26 +31,18 @@ bands:
         - [132, 225, 255, 255]
         - [ 0, 123, 255, 255]
         - [119, 119, 119, 255]
-      color: Palette
       type: class
-    - name: confidence
-      description: percentage of lulc for all tiles (counts/nb_scenes)
-      data_type: Float32
-      data_range: [0.0,1.0]
-      display_range: [0,1.0]
-      color: Undefined
     - name: counts
-      description: count in stack with lulc value
-      data_range: [0,10]
-      display_range: [0,6]
+      description: percentage of lulc for all tiles
+      data_range: [0,255]
       nodata: 0
       color: Undefined
+      type: derived
 
 band_defaults:
-    data_type: Byte
-    resolution: 
-      value: 5
-      unit: meters
+    dtype: Byte
+    nbits: 8
+    resolution_unit: meters
 
 input:
     products:
@@ -67,22 +59,22 @@ model:
     filename: 6cat_india-all_exc.hd5
     key: 6cat_india-all_exc.hd5
 run:
-model: 
-    filename: 6cat_india-all_exc.hd5
-    key: 6cat_india-all_exc.hd5
-run:
-    # tile_set: hyderabad.geojson-5:512:8.p
-    # tile_set: sitapur_dev_2-5:32:8.p
-    tile_set: test_keys.p
+    tile_set: 'urban_india-5:512:8-b5.p'
     regions:
-        - urban_india.geojson
+        - test
     size: 512
     pad: window
     window: 17
-    # start_date: '2016-11-01'
-    # end_date: '2017-01-15'
     # start_date: '2017-11-01'
     # end_date: '2018-01-15'
     start_date: '2018-11-01'
     end_date: '2019-01-15'
+    # start_date: '2019-08-15'
+    # end_date: '2019-11-01'
+    # start_date:
+    #   - '2017-11-01'
+    #   - '2018-11-01'
+    # end_date:
+    #   - '2018-01-15'
+    #   - '2019-01-15'
     nb_scenes: 5
