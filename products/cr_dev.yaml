@@ -1,15 +1,17 @@
 product:
-    id: ulu-india
-    description: land use classes and confidence for urban india
+    id: ulu_predictions-cr-dev
+    mode_product_file: cr-dev_mode
+    mode_product_name: ulu-cr-dev
+    description: >-
+      land use classes and model outputs predicted from individual 
+      sentinel-2 scenes
     resolution: 5m
     readers: 
       - 'org:wri'
     notes: >-
-      this product is a mode maping of product 
-      "wri:ulu_predictions-india"
-      confidence is equal to the pixel level number of matching lulc 
-      prediction divided by the number of predictions.
-
+      see product "wri:ulu-cr-dev" to obtain
+      land use classes
+    
 bands:
     - name: lulc
       description: landuse/landcover classes
@@ -34,22 +36,23 @@ bands:
         - [119, 119, 119, 255]
       color: Palette
       type: class
-    - name: counts
-      description: >-
-        number of observations (predictions) per pixel 
-        for the predicted value 
-      data_range: [0,10]
-      display_range: [0,6]
-      nodata: 0
+    - name: scores
+      description: output probablity from model
+      data_type: Float32
+      data_range: [0.0,1.0]
+      display_range: [0,1.0]
       color: Undefined
-    - name: observations
-      description: >-
-        number of observations (predictions) per pixel of any value, 
-        such that the percent argreement is equal to counts/observations)
-      data_range: [0,10]
-      display_range: [0,6]
-      nodata: 0
+    - name: cloud_score
+      description: mean cloud value(0 or 1) in window of pixel
+      data_type: Float32
+      data_range: [0.0,1.0]
+      display_range: [0,1.0]
       color: Undefined
+    - name: water_mask
+      description: 1=water, 0=no-water 
+      data_range: [0,1]
+      nodata: 1
+      type: mask
 
 band_defaults:
     data_type: Byte
@@ -69,27 +72,26 @@ input:
         - swir2
         - alpha
 model: 
-    filename: 6cat_india-all_exc.hd5
-    key: 6cat_india-all_exc.hd5
+    filename: 6cat_9city_2img_Mexico
+    key: 6cat_9city_2img_Mexico
 run:
-model: 
-    filename: 6cat_india-all_exc.hd5
-    key: 6cat_india-all_exc.hd5
-run:
-    tile_set: urban_india-5:512:8-b0.p
+    # tile_set: urban_india-5:512:8-b0.p
     # tile_set: sitapur_dev_2-5:32:8.p
     # tile_set: test_keys.p
     regions:
-        - urban_india.geojson
-    size: 512
+        - cr_test.geojson
+    size: 32
     pad: window
     window: 17
-    start_date: '2016-11-01'
-    end_date: '2017-01-15'
+    # start_date: '2016-11-01'
+    # end_date: '2017-01-15'
     # start_date: '2017-11-01'
     # end_date: '2018-01-15'
     # start_date: '2018-11-01'
     # end_date: '2019-01-15'
-    # start_date: '2019-11-01'
-    # end_date: '2020-01-15'
+    start_date: '2019-11-01'
+    end_date: '2020-01-15'
     nb_scenes: 5
+
+
+

@@ -1,7 +1,8 @@
 # dl_jobs: config
-# cpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7/default:v2019.11.18-6-ga7ee1224
-cpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.6/default:v2019.11.18-6-ga7ee1224
-gpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.6-gpu/default:v2019.11.18-6-ga7ee1224
+# cpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.6/default:v2019.11.18-6-ga7ee1224
+# gpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.6-gpu/default:v2019.11.18-6-ga7ee1224
+cpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7:v1.1.1
+gpu_image: us.gcr.io/dl-ci-cd/images/tasks/public/py3.7-gpu:v1.1.1
 cpu_job: true
 cpus: 1
 default_method: task

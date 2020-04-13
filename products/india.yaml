@@ -1,7 +1,7 @@
 product:
-    id: tmp-ulu_predictions-india
+    id: ulu_predictions-india
     mode_product_file: india_mode
-    mode_product_name: tmp-ulu-india
+    mode_product_name: ulu-india
     description: >-
       land use classes and model outputs predicted from individual 
       sentinel-2 scenes
@@ -83,14 +83,14 @@ run:
     size: 512
     pad: window
     window: 17
-    # start_date: '2016-11-01'
-    # end_date: '2017-01-15'
+    start_date: '2016-11-01'
+    end_date: '2017-01-15'
     # start_date: '2017-11-01'
     # end_date: '2018-01-15'
     # start_date: '2018-11-01'
     # end_date: '2019-01-15'
-    start_date: '2019-11-01'
-    end_date: '2020-01-15'
+    # start_date: '2019-11-01'
+    # end_date: '2020-01-15'
     nb_scenes: 5
 
 
